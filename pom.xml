@@ -10,4 +10,12 @@
         <maven.compiler.release>23</maven.compiler.release>
         <exec.mainClass>com.mycompany.mavenproject26.Mavenproject26</exec.mainClass>
     </properties>
+    <dependencies>
+        <dependency>
+            <groupId>com.toedter</groupId>
+            <artifactId>jcalendar</artifactId>
+            <version>1.4</version>
+        </dependency>
+    </dependencies>
+
 </project>
