@@ -362,7 +362,7 @@
             <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
               <Color blue="0" green="85" red="f2" type="rgb"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="Elections"/>
+            <Property name="text" type="java.lang.String" value="Election"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JComboBox" name="jComboBox3">

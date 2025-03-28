@@ -165,7 +165,7 @@ public class Candidates extends javax.swing.JFrame {
 
         jLabel7.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 18)); // NOI18N
         jLabel7.setForeground(new java.awt.Color(242, 133, 0));
-        jLabel7.setText("Elections");
+        jLabel7.setText("Election");
 
         jComboBox3.setFont(new java.awt.Font("Microsoft YaHei UI", 0, 14)); // NOI18N
         jComboBox3.setForeground(new java.awt.Color(242, 133, 0));
