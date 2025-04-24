@@ -13,10 +13,10 @@ import net.proteanit.sql.DbUtils;
 
 public class Elections extends javax.swing.JFrame {
 
-    Connection Con = null;
-    PreparedStatement pst = null;
-    ResultSet Ru = null;
-    Statement St = null;
+//    Connection Con = null;
+//    PreparedStatement pst = null;
+//    ResultSet Ru = null;
+//    Statement St = null;
 
     public Elections() {
         initComponents();
