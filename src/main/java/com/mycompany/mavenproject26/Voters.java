@@ -4,6 +4,14 @@
  */
 package com.mycompany.mavenproject26;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import net.proteanit.sql.DbUtils;
+
 /**
  *
  * @author ABC
@@ -15,6 +23,9 @@ public class Voters extends javax.swing.JFrame {
      */
     public Voters() {
         initComponents();
+        GetElections();
+        DisplayVoters();
+        
     }
 
     /**
@@ -32,20 +43,20 @@ public class Voters extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
-        jButton6 = new javax.swing.JButton();
+        EditBtn = new javax.swing.JButton();
+        AddBtn = new javax.swing.JButton();
+        DeleteBtn = new javax.swing.JButton();
+        BackBtn = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
-        jTable3 = new javax.swing.JTable();
-        jComboBox1 = new javax.swing.JComboBox<>();
-        jTextField2 = new javax.swing.JTextField();
+        VotersTable = new javax.swing.JTable();
+        VGenderCb = new javax.swing.JComboBox<>();
+        VNameTb = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
-        jComboBox3 = new javax.swing.JComboBox<>();
+        VSocietyCb = new javax.swing.JComboBox<>();
         jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
-        jTextField4 = new javax.swing.JTextField();
-        jComboBox4 = new javax.swing.JComboBox<>();
+        VPasswordTb = new javax.swing.JTextField();
+        VElectionCb = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -84,43 +95,48 @@ public class Voters extends javax.swing.JFrame {
         jLabel5.setForeground(new java.awt.Color(242, 133, 0));
         jLabel5.setText("Gender");
 
-        jButton3.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jButton3.setForeground(new java.awt.Color(242, 133, 0));
-        jButton3.setText("Edit");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        EditBtn.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        EditBtn.setForeground(new java.awt.Color(242, 133, 0));
+        EditBtn.setText("Edit");
+        EditBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                EditBtnActionPerformed(evt);
             }
         });
 
-        jButton4.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jButton4.setForeground(new java.awt.Color(242, 133, 0));
-        jButton4.setText("Add");
-        jButton4.addActionListener(new java.awt.event.ActionListener() {
+        AddBtn.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        AddBtn.setForeground(new java.awt.Color(242, 133, 0));
+        AddBtn.setText("Add");
+        AddBtn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                AddBtnMouseClicked(evt);
+            }
+        });
+        AddBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton4ActionPerformed(evt);
+                AddBtnActionPerformed(evt);
             }
         });
 
-        jButton5.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jButton5.setForeground(new java.awt.Color(242, 133, 0));
-        jButton5.setText("Delete");
-        jButton5.addActionListener(new java.awt.event.ActionListener() {
+        DeleteBtn.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        DeleteBtn.setForeground(new java.awt.Color(242, 133, 0));
+        DeleteBtn.setText("Delete");
+        DeleteBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton5ActionPerformed(evt);
+                DeleteBtnActionPerformed(evt);
             }
         });
 
-        jButton6.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jButton6.setForeground(new java.awt.Color(242, 133, 0));
-        jButton6.setText("Back");
-        jButton6.addActionListener(new java.awt.event.ActionListener() {
+        BackBtn.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        BackBtn.setForeground(new java.awt.Color(242, 133, 0));
+        BackBtn.setText("Back");
+        BackBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton6ActionPerformed(evt);
+                BackBtnActionPerformed(evt);
             }
         });
 
-        jTable3.setModel(new javax.swing.table.DefaultTableModel(
+        VotersTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -131,20 +147,20 @@ public class Voters extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane3.setViewportView(jTable3);
+        jScrollPane3.setViewportView(VotersTable);
 
-        jComboBox1.setFont(new java.awt.Font("Microsoft YaHei UI", 0, 14)); // NOI18N
-        jComboBox1.setForeground(new java.awt.Color(242, 133, 0));
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Male", "Female" }));
-        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+        VGenderCb.setFont(new java.awt.Font("Microsoft YaHei UI", 0, 14)); // NOI18N
+        VGenderCb.setForeground(new java.awt.Color(242, 133, 0));
+        VGenderCb.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Male", "Female" }));
+        VGenderCb.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox1ActionPerformed(evt);
+                VGenderCbActionPerformed(evt);
             }
         });
 
-        jTextField2.addActionListener(new java.awt.event.ActionListener() {
+        VNameTb.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField2ActionPerformed(evt);
+                VNameTbActionPerformed(evt);
             }
         });
 
@@ -152,11 +168,11 @@ public class Voters extends javax.swing.JFrame {
         jLabel7.setForeground(new java.awt.Color(242, 133, 0));
         jLabel7.setText("Society");
 
-        jComboBox3.setFont(new java.awt.Font("Microsoft YaHei UI", 0, 14)); // NOI18N
-        jComboBox3.setForeground(new java.awt.Color(242, 133, 0));
-        jComboBox3.addActionListener(new java.awt.event.ActionListener() {
+        VSocietyCb.setFont(new java.awt.Font("Microsoft YaHei UI", 0, 14)); // NOI18N
+        VSocietyCb.setForeground(new java.awt.Color(242, 133, 0));
+        VSocietyCb.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox3ActionPerformed(evt);
+                VSocietyCbActionPerformed(evt);
             }
         });
 
@@ -168,17 +184,17 @@ public class Voters extends javax.swing.JFrame {
         jLabel9.setForeground(new java.awt.Color(242, 133, 0));
         jLabel9.setText("Election");
 
-        jTextField4.addActionListener(new java.awt.event.ActionListener() {
+        VPasswordTb.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField4ActionPerformed(evt);
+                VPasswordTbActionPerformed(evt);
             }
         });
 
-        jComboBox4.setFont(new java.awt.Font("Microsoft YaHei UI", 0, 14)); // NOI18N
-        jComboBox4.setForeground(new java.awt.Color(242, 133, 0));
-        jComboBox4.addActionListener(new java.awt.event.ActionListener() {
+        VElectionCb.setFont(new java.awt.Font("Microsoft YaHei UI", 0, 14)); // NOI18N
+        VElectionCb.setForeground(new java.awt.Color(242, 133, 0));
+        VElectionCb.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox4ActionPerformed(evt);
+                VElectionCbActionPerformed(evt);
             }
         });
 
@@ -191,27 +207,27 @@ public class Voters extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jButton4)
+                        .addComponent(AddBtn)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton3)
+                        .addComponent(EditBtn)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton5)
+                        .addComponent(DeleteBtn)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton6))
+                        .addComponent(BackBtn))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel4)
-                            .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 185, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(VNameTb, javax.swing.GroupLayout.PREFERRED_SIZE, 185, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel5)
-                            .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addComponent(VGenderCb, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addComponent(jLabel7)
-                    .addComponent(jComboBox3, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(VSocietyCb, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel8)
                     .addComponent(jLabel9)
-                    .addComponent(jTextField4)
-                    .addComponent(jComboBox4, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(VPasswordTb)
+                    .addComponent(VElectionCb, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 552, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -234,26 +250,26 @@ public class Voters extends javax.swing.JFrame {
                             .addComponent(jLabel5))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(VGenderCb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(VNameTb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel7)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(VSocietyCb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel9)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jComboBox4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(VElectionCb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel8)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(VPasswordTb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(152, 152, 152)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jButton4)
-                            .addComponent(jButton3)
-                            .addComponent(jButton5)
-                            .addComponent(jButton6)))
+                            .addComponent(AddBtn)
+                            .addComponent(EditBtn)
+                            .addComponent(DeleteBtn)
+                            .addComponent(BackBtn)))
                     .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 414, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(64, Short.MAX_VALUE))
         );
@@ -272,41 +288,95 @@ public class Voters extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+    private void EditBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EditBtnActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton3ActionPerformed
+    }//GEN-LAST:event_EditBtnActionPerformed
 
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+    private void AddBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AddBtnActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton4ActionPerformed
+    }//GEN-LAST:event_AddBtnActionPerformed
 
-    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+    private void DeleteBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DeleteBtnActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton5ActionPerformed
+    }//GEN-LAST:event_DeleteBtnActionPerformed
 
-    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+    private void BackBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BackBtnActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton6ActionPerformed
+    }//GEN-LAST:event_BackBtnActionPerformed
 
-    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+    private void VGenderCbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_VGenderCbActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jComboBox1ActionPerformed
+    }//GEN-LAST:event_VGenderCbActionPerformed
 
-    private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
+    private void VNameTbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_VNameTbActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField2ActionPerformed
+    }//GEN-LAST:event_VNameTbActionPerformed
 
-    private void jComboBox3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox3ActionPerformed
+    private void VSocietyCbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_VSocietyCbActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jComboBox3ActionPerformed
+    }//GEN-LAST:event_VSocietyCbActionPerformed
 
-    private void jTextField4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField4ActionPerformed
+    private void VPasswordTbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_VPasswordTbActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField4ActionPerformed
+    }//GEN-LAST:event_VPasswordTbActionPerformed
 
-    private void jComboBox4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox4ActionPerformed
+    private void VElectionCbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_VElectionCbActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jComboBox4ActionPerformed
+    }//GEN-LAST:event_VElectionCbActionPerformed
+    Connection Con = null;
+    PreparedStatement pst = null;
+    ResultSet Ru = null;
+    Statement St = null;
+   private void GetElections() {
+    try {
+        // Database connection
+        Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
+        St = Con.createStatement();
+        
+        // Correct SQL query: Use the correct table name without a hyphen
+        String Query = "SELECT * FROM election_tbl"; // Corrected table name
+        Ru = St.executeQuery(Query);
+
+        // Loop through the result set and add items to ComboBox
+        while (Ru.next()) {
+            String ElectId = Ru.getString("e_id");  // Assuming 'e_id' is the primary key
+            String ElectName = Ru.getString("e_name");  // Assuming 'e_name' is the name of the election
+
+            // Add the election name or id to ComboBox
+            VElectionCb.addItem(ElectId);  // Add election name (you can also add 'ElectId' if needed)
+        }
+    } catch (Exception e) {
+        e.printStackTrace(); // Add this to see the error in the console if any
+    }
+}
+
+    private void DisplayVoters() {
+        try {
+            Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
+            St = Con.createStatement();
+            Ru = St.executeQuery("Select * from voter_tbl");
+            VotersTable.setModel(DbUtils.resultSetToTableModel(Ru));
+        } catch (SQLException Ex) {
+
+        }
+    }
+        int VId = 0;
+    Statement St1 = null;
+    ResultSet Rs1 = null;
+        private void CandCount() {
+        try {
+            St1 = Con.createStatement();
+            Rs1 = St1.executeQuery("select MAx(v_id) from voter_tbl");
+            Rs1.next();
+            VId = Rs1.getInt(1) + 1;
+        } catch (Exception Ex) {
+
+        }
+    }
+        
+    private void AddBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_AddBtnMouseClicked
+        
+    }//GEN-LAST:event_AddBtnMouseClicked
 
     /**
      * @param args the command line arguments
@@ -344,13 +414,16 @@ public class Voters extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
-    private javax.swing.JButton jButton6;
-    private javax.swing.JComboBox<String> jComboBox1;
-    private javax.swing.JComboBox<String> jComboBox3;
-    private javax.swing.JComboBox<String> jComboBox4;
+    private javax.swing.JButton AddBtn;
+    private javax.swing.JButton BackBtn;
+    private javax.swing.JButton DeleteBtn;
+    private javax.swing.JButton EditBtn;
+    private javax.swing.JComboBox<String> VElectionCb;
+    private javax.swing.JComboBox<String> VGenderCb;
+    private javax.swing.JTextField VNameTb;
+    private javax.swing.JTextField VPasswordTb;
+    private javax.swing.JComboBox<String> VSocietyCb;
+    private javax.swing.JTable VotersTable;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -361,8 +434,5 @@ public class Voters extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JTable jTable3;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField4;
     // End of variables declaration//GEN-END:variables
 }

@@ -13,10 +13,10 @@ import net.proteanit.sql.DbUtils;
 
 public class Elections extends javax.swing.JFrame {
 
-//    Connection Con = null;
-//    PreparedStatement pst = null;
-//    ResultSet Ru = null;
-//    Statement St = null;
+    Connection Con = null;
+    PreparedStatement pst = null;
+    ResultSet Ru = null;
+    Statement St = null;
 
     public Elections() {
         initComponents();
@@ -258,6 +258,11 @@ public class Elections extends javax.swing.JFrame {
         EditButton.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         EditButton.setForeground(new java.awt.Color(242, 133, 0));
         EditButton.setText("Edit");
+        EditButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                EditButtonMouseClicked(evt);
+            }
+        });
         EditButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 EditButtonActionPerformed(evt);
@@ -490,10 +495,50 @@ public class Elections extends javax.swing.JFrame {
     }//GEN-LAST:event_ElectionTableMouseClicked
 
     private void DeleteButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_DeleteButtonMouseClicked
-        
+        if(Key == -1){
+            JOptionPane.showMessageDialog(this, "Select The Election To Be Deleted!");
+        }else{
+            try{
+                Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
+                String Query= "Delete from election_tbl where e_id="+ Key;
+                Statement Del=Con.createStatement();
+                Del.executeUpdate(Query);
+                JOptionPane.showMessageDialog(this, "Election Deleted Successfilly!");
+               DisplayELections();
+            }catch(Exception e){
+                JOptionPane.showMessageDialog(this, e);
+            }
+        }
     }//GEN-LAST:event_DeleteButtonMouseClicked
 
-    /**
+    private void EditButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_EditButtonMouseClicked
+        if(Key == -1|| ElectionDate.getDate().toString().isEmpty()){
+            JOptionPane.showMessageDialog(this, "Missing Information.");
+        }else{
+            try{
+                String Day = String.valueOf(ElectionDate.getDate().getDay());
+                String Month = String.valueOf(ElectionDate.getDate().getMonth());
+                String Year = String.valueOf(ElectionDate.getDate().getYear());
+                String EDate = Day + "/" + Month + "/" + Year; 
+                Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
+                String Query= "Update election_tbl set e_name=?,e_date=? where e_id=?";
+                PreparedStatement UpdateQuery=Con.prepareStatement(Query);
+                UpdateQuery.setString(1, ElectionNameTextBox.getText());
+                UpdateQuery.setString(2, EDate);
+                UpdateQuery.setInt(3, Key);
+               if(UpdateQuery.executeUpdate( )==1) 
+               { JOptionPane.showMessageDialog(this, "Election Updated Successfilly!");
+               DisplayELections();}
+               else{
+                   JOptionPane.showMessageDialog(this, "Missing Information");
+               }
+            }catch(Exception e){
+                JOptionPane.showMessageDialog(this, e);
+            }
+        }
+    }//GEN-LAST:event_EditButtonMouseClicked
+
+    /** 
      * @param args the command line arguments
      */
     public static void main(String args[]) {
