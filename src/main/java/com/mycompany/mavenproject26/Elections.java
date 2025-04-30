@@ -8,7 +8,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
-//import org.apache.commons.dbutils.DbUtils;
 import net.proteanit.sql.DbUtils;
 
 public class Elections extends javax.swing.JFrame {
@@ -21,6 +20,25 @@ public class Elections extends javax.swing.JFrame {
     public Elections() {
         initComponents();
         DisplayELections();
+        GetSocieties();
+    }
+
+    private void GetSocieties() {
+        try {
+            Connection Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
+            Statement St = Con.createStatement();
+
+            ResultSet rsSocieties = St.executeQuery("SELECT society_name FROM society_tbl");
+            while (rsSocieties.next()) {
+                SocietyComboBox.addItem(rsSocieties.getString("society_name"));
+            }
+
+            rsSocieties.close();
+            St.close();
+            Con.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -42,6 +60,7 @@ public class Elections extends javax.swing.JFrame {
         jButton8 = new javax.swing.JButton();
         jButton9 = new javax.swing.JButton();
         jButton10 = new javax.swing.JButton();
+        CandSocietyCb = new javax.swing.JComboBox<>();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
@@ -54,8 +73,10 @@ public class Elections extends javax.swing.JFrame {
         DeleteButton = new javax.swing.JButton();
         BackButton = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
-        ElectionTable = new javax.swing.JTable();
+        ElectionsTable = new javax.swing.JTable();
         ElectionDate = new com.toedter.calendar.JDateChooser();
+        jLabel10 = new javax.swing.JLabel();
+        SocietyComboBox = new javax.swing.JComboBox<>();
 
         jButton1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jButton1.setForeground(new java.awt.Color(242, 133, 0));
@@ -211,6 +232,14 @@ public class Elections extends javax.swing.JFrame {
                 .addContainerGap(50, Short.MAX_VALUE))
         );
 
+        CandSocietyCb.setFont(new java.awt.Font("Microsoft YaHei UI", 0, 14)); // NOI18N
+        CandSocietyCb.setForeground(new java.awt.Color(242, 133, 0));
+        CandSocietyCb.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CandSocietyCbActionPerformed(evt);
+            }
+        });
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
 
@@ -227,7 +256,7 @@ public class Elections extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGap(263, 263, 263)
                 .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 362, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(275, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -306,7 +335,7 @@ public class Elections extends javax.swing.JFrame {
             }
         });
 
-        ElectionTable.setModel(new javax.swing.table.DefaultTableModel(
+        ElectionsTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null},
                 {null, null, null},
@@ -314,17 +343,21 @@ public class Elections extends javax.swing.JFrame {
                 {null, null, null}
             },
             new String [] {
-                "ID", "Name", "Date"
+                "Name", "Society", "Date"
             }
         ));
-        ElectionTable.setRowHeight(25);
-        ElectionTable.setSelectionBackground(new java.awt.Color(242, 133, 0));
-        ElectionTable.addMouseListener(new java.awt.event.MouseAdapter() {
+        ElectionsTable.setRowHeight(25);
+        ElectionsTable.setSelectionBackground(new java.awt.Color(242, 133, 0));
+        ElectionsTable.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                ElectionTableMouseClicked(evt);
+                ElectionsTableMouseClicked(evt);
             }
         });
-        jScrollPane3.setViewportView(ElectionTable);
+        jScrollPane3.setViewportView(ElectionsTable);
+
+        jLabel10.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 18)); // NOI18N
+        jLabel10.setForeground(new java.awt.Color(242, 133, 0));
+        jLabel10.setText("Society");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -332,45 +365,54 @@ public class Elections extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(383, 383, 383)
-                .addComponent(jLabel2)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel4)
-                    .addComponent(jLabel5)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(AddButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(EditButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(DeleteButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(BackButton))
-                    .addComponent(ElectionNameTextBox, javax.swing.GroupLayout.DEFAULT_SIZE, 370, Short.MAX_VALUE)
-                    .addComponent(ElectionDate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 488, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(383, 383, 383)
+                        .addComponent(jLabel2)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(jLabel4)
+                                .addComponent(ElectionNameTextBox, javax.swing.GroupLayout.DEFAULT_SIZE, 370, Short.MAX_VALUE)
+                                .addComponent(ElectionDate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel10)
+                                .addComponent(jLabel5)
+                                .addComponent(SocietyComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(AddButton)
+                                .addGap(18, 18, 18)
+                                .addComponent(EditButton)
+                                .addGap(18, 18, 18)
+                                .addComponent(DeleteButton)
+                                .addGap(18, 18, 18)
+                                .addComponent(BackButton)))
+                        .addGap(18, 18, 18)
+                        .addComponent(jScrollPane3)))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(18, 18, 18)
                 .addComponent(jLabel2)
-                .addGap(30, 30, 30)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel4)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(ElectionNameTextBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel10)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(SocietyComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
                         .addComponent(jLabel5)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(ElectionDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(266, 266, 266)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(AddButton)
                             .addComponent(EditButton)
@@ -434,7 +476,7 @@ public class Elections extends javax.swing.JFrame {
     private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton10ActionPerformed
-    
+
     int EId = 0;
     Statement St1 = null;
     ResultSet Rs1 = null;
@@ -455,15 +497,15 @@ public class Elections extends javax.swing.JFrame {
             Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
             St = Con.createStatement();
             Ru = St.executeQuery("Select * from election_tbl");
-            ElectionTable.setModel(DbUtils.resultSetToTableModel(Ru));
+            ElectionsTable.setModel(DbUtils.resultSetToTableModel(Ru));
         } catch (SQLException Ex) {
 
         }
     }
-    
+
     private void AddButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_AddButtonMouseClicked
-        if (ElectionNameTextBox.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Enter the Election Name");
+        if (ElectionNameTextBox.getText().isEmpty() || SocietyComboBox.getSelectedIndex() == -1) {
+            JOptionPane.showMessageDialog(this, "Missing Fields!");
         } else {
             try {
                 String Day = String.valueOf(ElectionDate.getDate().getDay());
@@ -472,10 +514,11 @@ public class Elections extends javax.swing.JFrame {
                 String EDate = Day + "/" + Month + "/" + Year;
                 ElecCount();
                 Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
-                PreparedStatement Add = Con.prepareStatement("Insert into election_tbl values(?,?,?)");
+                PreparedStatement Add = Con.prepareStatement("Insert into election_tbl values(?,?,?,?)");
                 Add.setInt(1, EId);
                 Add.setString(2, ElectionNameTextBox.getText());
-                Add.setString(3, EDate);
+                Add.setString(3, SocietyComboBox.getSelectedItem().toString());
+                Add.setString(4, EDate);
                 int row = Add.executeUpdate();
                 JOptionPane.showMessageDialog(this, "Election Added Successfully!");
                 Con.close();
@@ -485,87 +528,66 @@ public class Elections extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_AddButtonMouseClicked
-    
+
     int Key = -1;
-    private void ElectionTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ElectionTableMouseClicked
-        DefaultTableModel model = (DefaultTableModel) ElectionTable.getModel();
-        int MyIndex = ElectionTable.getSelectedRow();
+    private void ElectionsTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ElectionsTableMouseClicked
+        DefaultTableModel model = (DefaultTableModel) ElectionsTable.getModel();
+        int MyIndex = ElectionsTable.getSelectedRow();
         Key = Integer.valueOf(model.getValueAt(MyIndex, 0).toString());
         ElectionNameTextBox.setText(model.getValueAt(MyIndex, 1).toString());
-    }//GEN-LAST:event_ElectionTableMouseClicked
+        SocietyComboBox.setSelectedItem(model.getValueAt(MyIndex, 2).toString());
+    }//GEN-LAST:event_ElectionsTableMouseClicked
 
     private void DeleteButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_DeleteButtonMouseClicked
-        if(Key == -1){
+        if (Key == -1) {
             JOptionPane.showMessageDialog(this, "Select The Election To Be Deleted!");
-        }else{
-            try{
+        } else {
+            try {
                 Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
-                String Query= "Delete from election_tbl where e_id="+ Key;
-                Statement Del=Con.createStatement();
+                String Query = "Delete from election_tbl where e_id=" + Key;
+                Statement Del = Con.createStatement();
                 Del.executeUpdate(Query);
                 JOptionPane.showMessageDialog(this, "Election Deleted Successfilly!");
-               DisplayELections();
-            }catch(Exception e){
+                DisplayELections();
+            } catch (Exception e) {
                 JOptionPane.showMessageDialog(this, e);
             }
         }
     }//GEN-LAST:event_DeleteButtonMouseClicked
 
     private void EditButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_EditButtonMouseClicked
-        if(Key == -1|| ElectionDate.getDate().toString().isEmpty()){
-            JOptionPane.showMessageDialog(this, "Missing Information.");
-        }else{
-            try{
+        if (Key == -1 || ElectionDate.getDate().toString().isEmpty() || SocietyComboBox.getSelectedIndex() == -1) {
+            JOptionPane.showMessageDialog(this, "Missing Information!");
+        } else {
+            try {
                 String Day = String.valueOf(ElectionDate.getDate().getDay());
                 String Month = String.valueOf(ElectionDate.getDate().getMonth());
                 String Year = String.valueOf(ElectionDate.getDate().getYear());
-                String EDate = Day + "/" + Month + "/" + Year; 
+                String EDate = Day + "/" + Month + "/" + Year;
                 Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
-                String Query= "Update election_tbl set e_name=?,e_date=? where e_id=?";
-                PreparedStatement UpdateQuery=Con.prepareStatement(Query);
+                String Query = "Update election_tbl set e_name=?, e_society=?, e_date=? where e_id=?";
+                PreparedStatement UpdateQuery = Con.prepareStatement(Query);
                 UpdateQuery.setString(1, ElectionNameTextBox.getText());
-                UpdateQuery.setString(2, EDate);
-                UpdateQuery.setInt(3, Key);
-               if(UpdateQuery.executeUpdate( )==1) 
-               { JOptionPane.showMessageDialog(this, "Election Updated Successfilly!");
-               DisplayELections();}
-               else{
-                   JOptionPane.showMessageDialog(this, "Missing Information");
-               }
-            }catch(Exception e){
+                UpdateQuery.setString(2, SocietyComboBox.getSelectedItem().toString());
+                UpdateQuery.setString(3, EDate);
+                UpdateQuery.setInt(4, Key);
+                if (UpdateQuery.executeUpdate() == 1) {
+                    JOptionPane.showMessageDialog(this, "Election Updated Successfilly!");
+                    DisplayELections();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Missing Information!");
+                }
+            } catch (Exception e) {
                 JOptionPane.showMessageDialog(this, e);
             }
         }
     }//GEN-LAST:event_EditButtonMouseClicked
 
-    /** 
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Elections.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Elections.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Elections.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Elections.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
+    private void CandSocietyCbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CandSocietyCbActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_CandSocietyCbActionPerformed
 
-        /* Create and display the form */
+    public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new Elections().setVisible(true);
@@ -576,17 +598,20 @@ public class Elections extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton AddButton;
     private javax.swing.JButton BackButton;
+    private javax.swing.JComboBox<String> CandSocietyCb;
     private javax.swing.JButton DeleteButton;
     private javax.swing.JButton EditButton;
     private com.toedter.calendar.JDateChooser ElectionDate;
     private javax.swing.JTextField ElectionNameTextBox;
-    private javax.swing.JTable ElectionTable;
+    private javax.swing.JTable ElectionsTable;
+    private javax.swing.JComboBox<String> SocietyComboBox;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton10;
     private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
     private javax.swing.JButton jButton9;
     private com.toedter.calendar.JDayChooser jDayChooser3;
+    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
