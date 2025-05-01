@@ -87,6 +87,11 @@ public class Voters extends javax.swing.JFrame {
         EditBtn.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         EditBtn.setForeground(new java.awt.Color(242, 133, 0));
         EditBtn.setText("Edit");
+        EditBtn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                EditBtnMouseClicked(evt);
+            }
+        });
         EditBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 EditBtnActionPerformed(evt);
@@ -252,9 +257,9 @@ public class Voters extends javax.swing.JFrame {
                             .addComponent(jLabel4)
                             .addComponent(jLabel5))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(VNameTb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(VGenderCb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(VGenderCb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(VNameTb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(20, 20, 20)
                         .addComponent(jLabel7)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -437,6 +442,33 @@ public class Voters extends javax.swing.JFrame {
         VElectionCb.setSelectedItem(model.getValueAt(MyIndex, 4).toString());
         VPasswordTb.setText(model.getValueAt(MyIndex, 5).toString());
     }//GEN-LAST:event_VotersTableMouseClicked
+
+    private void EditBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_EditBtnMouseClicked
+        if (Key == -1 || VNameTb.getText().isEmpty() || VGenderCb.getSelectedIndex() == -1 || VSocietyCb.getSelectedIndex() == -1 || VElectionCb.getSelectedIndex() == -1 || VPasswordTb.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Missing Information!");
+        } else{
+            try {
+                Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
+                String Query = "Update voter_tbl set v_name=?, v_gen=?, v_society=?, v_election=?, v_pass=? where v_id=?";
+                PreparedStatement UpdateQuery = Con.prepareStatement(Query);
+                UpdateQuery.setString(1, VNameTb.getText());
+                UpdateQuery.setString(2, VGenderCb.getSelectedItem().toString());
+                UpdateQuery.setString(3, VSocietyCb.getSelectedItem().toString());
+                UpdateQuery.setString(4, VElectionCb.getSelectedItem().toString());
+                UpdateQuery.setString(5, VPasswordTb.getText().toString());
+                UpdateQuery.setInt(6, Key);
+                if (UpdateQuery.executeUpdate() == 1) {
+                    JOptionPane.showMessageDialog(this, "Voter Updated Successfully!");
+                    DisplayVoters();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Missing Information");
+                }
+
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, e);
+            }
+        } 
+    }//GEN-LAST:event_EditBtnMouseClicked
 
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {

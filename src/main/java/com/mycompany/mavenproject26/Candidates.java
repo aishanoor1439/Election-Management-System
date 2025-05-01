@@ -473,7 +473,7 @@ public class Candidates extends javax.swing.JFrame {
     }//GEN-LAST:event_AddBtnMouseClicked
 
     private void FetchPhoto() {
-        String Query = "Select c_photo from candidate_tbl where c_id" + Key;
+        String Query = "Select c_photo from candidate_tbl where c_id = " + Key;
         Statement St;
         ResultSet Rs;
         try {
@@ -519,7 +519,7 @@ public class Candidates extends javax.swing.JFrame {
     }//GEN-LAST:event_DeleteBtnMouseClicked
 
     private void EditBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_EditBtnMouseClicked
-        if (Key == -1 || CandNameTb.getText().isEmpty() || CandGenderCb.getSelectedIndex() == -1 || CandElectionCb.getSelectedIndex() == -1) {
+        if (Key == -1 || CandNameTb.getText().isEmpty() || CandGenderCb.getSelectedIndex() == -1 || CandSocietyCb.getSelectedIndex() == -1 || CandElectionCb.getSelectedIndex() == -1) {
             JOptionPane.showMessageDialog(this, "Missing Information!");
         } else if (imgpath != null) {
             try {
@@ -534,7 +534,7 @@ public class Candidates extends javax.swing.JFrame {
                 UpdateQuery.setString(5, CandElectionCb.getSelectedItem().toString());
                 UpdateQuery.setInt(6, Key);
                 if (UpdateQuery.executeUpdate() == 1) {
-                    JOptionPane.showMessageDialog(this, "Candidate Updated Successfilly!");
+                    JOptionPane.showMessageDialog(this, "Candidate Updated Successfully!");
                     DisplayCandidates();
                 } else {
                     JOptionPane.showMessageDialog(this, "Missing Information");
