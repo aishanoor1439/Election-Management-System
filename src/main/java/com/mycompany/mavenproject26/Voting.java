@@ -20,6 +20,14 @@ public class Voting extends javax.swing.JFrame {
         initComponents();
         DisplayCandidates();
     }
+    int VotingId;
+
+    public Voting(int VoterId) {
+        initComponents();
+        DisplayCandidates();
+        VotingId = VoterId;
+//        JOptionPane.showMessageDialog(this, VotingId);
+    }
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -29,7 +37,7 @@ public class Voting extends javax.swing.JFrame {
         jPanel2 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        jButton6 = new javax.swing.JButton();
+        BackBtn = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
         CandidatesTable = new javax.swing.JTable();
         jLabel8 = new javax.swing.JLabel();
@@ -67,12 +75,17 @@ public class Voting extends javax.swing.JFrame {
         jLabel2.setForeground(new java.awt.Color(242, 133, 0));
         jLabel2.setText("Vote");
 
-        jButton6.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jButton6.setForeground(new java.awt.Color(242, 133, 0));
-        jButton6.setText("Back");
-        jButton6.addActionListener(new java.awt.event.ActionListener() {
+        BackBtn.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        BackBtn.setForeground(new java.awt.Color(242, 133, 0));
+        BackBtn.setText("Back");
+        BackBtn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                BackBtnMouseClicked(evt);
+            }
+        });
+        BackBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton6ActionPerformed(evt);
+                BackBtnActionPerformed(evt);
             }
         });
 
@@ -131,28 +144,20 @@ public class Voting extends javax.swing.JFrame {
             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addGap(0, 372, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jButton6)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(VoteBtn)
-                        .addContainerGap())
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(CandidatePictureLb, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel8))
-                        .addGap(378, 378, 378))))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(CandidatePictureLb, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel8))
+                .addGap(378, 378, 378))
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(417, 417, 417)
-                        .addComponent(jLabel2)
-                        .addGap(0, 421, Short.MAX_VALUE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jScrollPane3))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(417, 417, 417)
+                                .addComponent(jLabel2))
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addContainerGap()
                                 .addComponent(jLabel11))
@@ -161,6 +166,15 @@ public class Voting extends javax.swing.JFrame {
                                 .addComponent(CandidateNameLb)))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(407, 407, 407)
+                        .addComponent(BackBtn))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(413, 413, 413)
+                        .addComponent(VoteBtn)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -175,14 +189,14 @@ public class Voting extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(CandidateNameLb)
                 .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton6)
-                    .addComponent(VoteBtn))
+                .addComponent(VoteBtn)
                 .addGap(18, 18, 18)
                 .addComponent(jLabel11)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(30, Short.MAX_VALUE))
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(BackBtn)
+                .addContainerGap(51, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -221,9 +235,9 @@ public class Voting extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_VoteBtnActionPerformed
 
-    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+    private void BackBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BackBtnActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton6ActionPerformed
+    }//GEN-LAST:event_BackBtnActionPerformed
 
     public ImageIcon ResizePhoto(String ImgPath, byte[] pic, javax.swing.JLabel label) {
         ImageIcon MyImage = null;
@@ -275,7 +289,7 @@ public class Voting extends javax.swing.JFrame {
     private void VCount() {
         try {
             St1 = Con.createStatement();
-            Rs1 = St1.executeQuery("select MAx(e_id) from election_tbl");
+            Rs1 = St1.executeQuery("select MAx(vote_id) from vote_tbl");
             Rs1.next();
             VId = Rs1.getInt(1) + 1;
         } catch (Exception Ex) {
@@ -288,22 +302,43 @@ public class Voting extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Select your Candidate!");
         } else {
             try {
-                VCount();
                 Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
-                PreparedStatement Add = Con.prepareStatement("Insert into vote_tbl (vote_id, e_id, c_id, society_id) values (?,?,?,?)");
-                Add.setInt(1, VId);
-                Add.setInt(2, ElecId);
-                Add.setInt(3, Key);
-                Add.setInt(4, SocId);
-                int row = Add.executeUpdate();
-                JOptionPane.showMessageDialog(this, "Vote Counted!");
+
+                PreparedStatement check = Con.prepareStatement("SELECT * FROM vote_tbl WHERE v_id = ? AND e_id = ?");
+                check.setInt(1, VotingId);  // VotingId is the actual voter's ID
+                check.setInt(2, ElecId);    // ElecId is the election ID
+                ResultSet rs = check.executeQuery();
+
+                if (rs.next()) {
+                    JOptionPane.showMessageDialog(this, "You have already voted in this election!");
+                } else {
+                    VCount();
+
+                    PreparedStatement Add = Con.prepareStatement("INSERT INTO vote_tbl (vote_id, e_id, c_id, v_id, society_id) VALUES (?,?,?,?,?)");
+                    Add.setInt(1, VId);         
+                    Add.setInt(2, ElecId);      
+                    Add.setInt(3, Key);         
+                    Add.setInt(4, VotingId);    
+                    Add.setInt(5, SocId);       
+
+                    Add.executeUpdate();
+                    JOptionPane.showMessageDialog(this, "Vote Counted!");
+                    DisplayCandidates();
+                    VoteBtn.setVisible(false);
+                }
+
                 Con.close();
-                DisplayCandidates();
             } catch (Exception e) {
-                JOptionPane.showMessageDialog(null, "You have already voted in this election!", "Duplicate Vote", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
             }
         }
+
     }//GEN-LAST:event_VoteBtnMouseClicked
+
+    private void BackBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BackBtnMouseClicked
+        new Login().setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_BackBtnMouseClicked
 
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -314,11 +349,11 @@ public class Voting extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton BackBtn;
     private javax.swing.JLabel CandidateNameLb;
     private javax.swing.JLabel CandidatePictureLb;
     private javax.swing.JTable CandidatesTable;
     private javax.swing.JButton VoteBtn;
-    private javax.swing.JButton jButton6;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
