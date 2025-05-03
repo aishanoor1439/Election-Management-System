@@ -1,8 +1,6 @@
 package com.mycompany.mavenproject26;
 
 import java.awt.Image;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -14,20 +12,28 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import net.proteanit.sql.DbUtils;
 
-public class Voting extends javax.swing.JFrame {
+public class Dashboard extends javax.swing.JFrame {
 
-    public Voting() {
+    public Dashboard() {
         initComponents();
-        DisplayCandidates();
+        DisplayELections();
     }
 
-    int VotingId;
+    Connection Con = null;
+    PreparedStatement pst = null;
+    ResultSet Ru = null;
+    Statement St = null;
+    ResultSet Rs = null;
 
-    public Voting(int VoterId) {
-        initComponents();
-        DisplayCandidates();
-        VotingId = VoterId;
-//        JOptionPane.showMessageDialog(this, VotingId);
+    private void DisplayELections() {
+        try {
+            Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
+            St = Con.createStatement();
+            Ru = St.executeQuery("Select * from election_tbl");
+            ElectionsTable.setModel(DbUtils.resultSetToTableModel(Ru));
+        } catch (SQLException Ex) {
+
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -40,14 +46,16 @@ public class Voting extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         BackBtn = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
-        CandidatesTable = new javax.swing.JTable();
+        ElectionsTable = new javax.swing.JTable();
         jLabel8 = new javax.swing.JLabel();
         CandidatePictureLb = new javax.swing.JLabel();
-        VoteBtn = new javax.swing.JButton();
         CandidateNameLb = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
+        VotesLb = new javax.swing.JLabel();
+        PercentageLb = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setUndecorated(true);
 
         jPanel2.setBackground(new java.awt.Color(242, 133, 0));
 
@@ -62,7 +70,7 @@ public class Voting extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGap(263, 263, 263)
                 .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 362, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(275, Short.MAX_VALUE))
+                .addContainerGap(325, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -74,7 +82,7 @@ public class Voting extends javax.swing.JFrame {
 
         jLabel2.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 24)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(242, 133, 0));
-        jLabel2.setText("Vote");
+        jLabel2.setText("Dashboard");
 
         BackBtn.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         BackBtn.setForeground(new java.awt.Color(242, 133, 0));
@@ -90,7 +98,7 @@ public class Voting extends javax.swing.JFrame {
             }
         });
 
-        CandidatesTable.setModel(new javax.swing.table.DefaultTableModel(
+        ElectionsTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -101,34 +109,20 @@ public class Voting extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        CandidatesTable.setSelectionBackground(new java.awt.Color(242, 133, 0));
-        CandidatesTable.addMouseListener(new java.awt.event.MouseAdapter() {
+        ElectionsTable.setSelectionBackground(new java.awt.Color(242, 133, 0));
+        ElectionsTable.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                CandidatesTableMouseClicked(evt);
+                ElectionsTableMouseClicked(evt);
             }
         });
-        jScrollPane3.setViewportView(CandidatesTable);
+        jScrollPane3.setViewportView(ElectionsTable);
 
         jLabel8.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 18)); // NOI18N
         jLabel8.setForeground(new java.awt.Color(242, 133, 0));
-        jLabel8.setText("Your Candidate");
+        jLabel8.setText("Winner");
 
         CandidatePictureLb.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 18)); // NOI18N
         CandidatePictureLb.setForeground(new java.awt.Color(242, 133, 0));
-
-        VoteBtn.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        VoteBtn.setForeground(new java.awt.Color(242, 133, 0));
-        VoteBtn.setText("Vote");
-        VoteBtn.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                VoteBtnMouseClicked(evt);
-            }
-        });
-        VoteBtn.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                VoteBtnActionPerformed(evt);
-            }
-        });
 
         CandidateNameLb.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 18)); // NOI18N
         CandidateNameLb.setForeground(new java.awt.Color(242, 133, 0));
@@ -136,19 +130,21 @@ public class Voting extends javax.swing.JFrame {
 
         jLabel11.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 18)); // NOI18N
         jLabel11.setForeground(new java.awt.Color(242, 133, 0));
-        jLabel11.setText("Candidates List");
+        jLabel11.setText("Elections List");
+
+        VotesLb.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 18)); // NOI18N
+        VotesLb.setForeground(new java.awt.Color(242, 133, 0));
+        VotesLb.setText("Votes");
+
+        PercentageLb.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 18)); // NOI18N
+        PercentageLb.setForeground(new java.awt.Color(242, 133, 0));
+        PercentageLb.setText("Percentage");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addGap(0, 372, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(CandidatePictureLb, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel8))
-                .addGap(378, 378, 378))
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
@@ -156,9 +152,6 @@ public class Voting extends javax.swing.JFrame {
                         .addComponent(jScrollPane3))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGap(417, 417, 417)
-                                .addComponent(jLabel2))
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addContainerGap()
                                 .addComponent(jLabel11))
@@ -173,9 +166,23 @@ public class Voting extends javax.swing.JFrame {
                         .addGap(407, 407, 407)
                         .addComponent(BackBtn))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(413, 413, 413)
-                        .addComponent(VoteBtn)))
+                        .addGap(414, 414, 414)
+                        .addComponent(jLabel8))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(380, 380, 380)
+                        .addComponent(jLabel2)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(VotesLb)
+                        .addGap(18, 18, 18)
+                        .addComponent(PercentageLb))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(0, 400, Short.MAX_VALUE)
+                        .addComponent(CandidatePictureLb, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(400, 400, 400))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -190,14 +197,16 @@ public class Voting extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(CandidateNameLb)
                 .addGap(18, 18, 18)
-                .addComponent(VoteBtn)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(VotesLb)
+                    .addComponent(PercentageLb))
                 .addGap(18, 18, 18)
                 .addComponent(jLabel11)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(BackBtn)
-                .addContainerGap(57, Short.MAX_VALUE))
+                .addContainerGap(60, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -212,31 +221,35 @@ public class Voting extends javax.swing.JFrame {
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    Connection Con = null;
-    PreparedStatement pst = null;
-    ResultSet Ru = null;
-    Statement St = null;
-
-    private void DisplayCandidates() {
-        try {
-            Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
-            St = Con.createStatement();
-            Ru = St.executeQuery("Select * from candidate_tbl");
-            CandidatesTable.setModel(DbUtils.resultSetToTableModel(Ru));
-        } catch (SQLException Ex) {
-
-        }
-    }
-
-    private void VoteBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_VoteBtnActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_VoteBtnActionPerformed
+    private void BackBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BackBtnMouseClicked
+        new Login().setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_BackBtnMouseClicked
 
     private void BackBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BackBtnActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_BackBtnActionPerformed
+
+    int WinnerID, Votes, Percentage;
+
+    private void GetWinner() {
+        try {
+            Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
+            St = Con.createStatement();
+            String Query = "SELECT c_id, COUNT(c_id) FROM vote_tbl WHERE e_id = " + Key + " GROUP BY c_id ORDER BY COUNT(c_id) DESC LIMIT 1";
+            Rs = St.executeQuery(Query);
+            if (Rs.next()) {
+                WinnerID = Rs.getInt("c_id");
+            } else {
+                JOptionPane.showMessageDialog(this, "No votes found for this election.");
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "GetWinner error: " + e.getMessage());
+        }
+    }
 
     public ImageIcon ResizePhoto(String ImgPath, byte[] pic, javax.swing.JLabel label) {
         ImageIcon MyImage = null;
@@ -252,150 +265,105 @@ public class Voting extends javax.swing.JFrame {
         return new ImageIcon(newImg);
     }
 
-    private void FetchPhoto() {
-        String Query = "Select c_photo from candidate_tbl where c_id = " + Key;
-        Statement St;
-        ResultSet Rs;
+    private void GetWinnerData() {
+        if (WinnerID == -1) {
+            JOptionPane.showMessageDialog(this, "Winner not determined yet.");
+            return;
+        }
+
+        String Query = "SELECT c_name, c_photo FROM candidate_tbl WHERE c_id = " + WinnerID;
+        try {
+            Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
+            Statement St = Con.createStatement();
+            ResultSet Rs = St.executeQuery(Query);
+            if (Rs.next()) {
+                CandidatePictureLb.setIcon(ResizePhoto(null, Rs.getBytes("c_photo"), CandidatePictureLb));
+                CandidateNameLb.setText(Rs.getString("c_name"));
+            } else {
+                JOptionPane.showMessageDialog(this, "Winner data not found.");
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "GetWinnerData error: " + e.getMessage());
+        }
+    }
+
+    private void GetVotes() {
         try {
             Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
             St = Con.createStatement();
+            String Query = "SELECT COUNT(c_id) FROM vote_tbl WHERE c_id = " + WinnerID;
             Rs = St.executeQuery(Query);
-            if (Rs.next()) {
-                CandidatePictureLb.setIcon(ResizePhoto(null, Rs.getBytes("c_photo"), CandidatePictureLb));
-
+            while (Rs.next()) {
+                Votes = Rs.getInt(1);
+//                JOptionPane.showMessageDialog(this, ""+Votes);
+                VotesLb.setText(Votes + "Votes");
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "GetWinner error: " + e.getMessage());
+        }
+    }
 
+    int TotalVotes;
+    double WinPercentage;
+
+    private void GetPercentage() {
+        try {
+            Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
+            St = Con.createStatement();
+            String Query = "SELECT COUNT(*) FROM vote_tbl WHERE e_id = " + Key;
+            Rs = St.executeQuery(Query);
+            while (Rs.next()) {
+                TotalVotes = Rs.getInt(1);
+                JOptionPane.showMessageDialog(this, ""+TotalVotes);
+                WinPercentage = (Votes/TotalVotes)*100;
+                PercentageLb.setText(WinPercentage+"%");
+                
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "GetWinner error: " + e.getMessage());
         }
     }
 
     int Key = -1;
-    int ElecId;
-    int SocId;
-
-    private void CandidatesTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_CandidatesTableMouseClicked
-//        DefaultTableModel model = (DefaultTableModel) CandidatesTable.getModel();
-//        int MyIndex = CandidatesTable.getSelectedRow();
-//
-//        Key = Integer.valueOf(model.getValueAt(MyIndex, 0).toString());
-//        SocId = Integer.valueOf(model.getValueAt(MyIndex, 3).toString());
-//        ElecId = Integer.valueOf(model.getValueAt(MyIndex, 4).toString());
-//
-//        FetchPhoto();
-        DefaultTableModel model = (DefaultTableModel) CandidatesTable.getModel();
-        int MyIndex = CandidatesTable.getSelectedRow();
-
+    
+    private void ElectionsTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ElectionsTableMouseClicked
+        DefaultTableModel model = (DefaultTableModel) ElectionsTable.getModel();
+        int MyIndex = ElectionsTable.getSelectedRow();
         Key = Integer.valueOf(model.getValueAt(MyIndex, 0).toString());
-
-        String societyName = model.getValueAt(MyIndex, 3).toString();
-        String electionName = model.getValueAt(MyIndex, 4).toString();
-
-        SocId = getSocietyIdByName(societyName);
-        ElecId = getElectionIdByName(electionName);
-
-        FetchPhoto();
-    }//GEN-LAST:event_CandidatesTableMouseClicked
-
-    private int getSocietyIdByName(String name) {
-        int id = -1;
-        try {
-            Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
-            pst = Con.prepareStatement("SELECT society_id FROM society_tbl WHERE society_name = ?");
-            pst.setString(1, name);
-            ResultSet rs = pst.executeQuery();
-            if (rs.next()) {
-                id = rs.getInt("society_id");
-            }
-            rs.close();
-            pst.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return id;
-    }
-
-    private int getElectionIdByName(String name) {
-        int id = -1;
-        try {
-            Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
-
-            pst = Con.prepareStatement("SELECT e_id FROM election_tbl WHERE e_name = ?");
-            pst.setString(1, name);
-            ResultSet rs = pst.executeQuery();
-            if (rs.next()) {
-                id = rs.getInt("e_id");
-            }
-            rs.close();
-            pst.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return id;
-    }
-
-    int VId = 0;
-    Statement St1 = null;
-    ResultSet Rs1 = null;
-
-    private void VCount() {
-        try {
-            St1 = Con.createStatement();
-            Rs1 = St1.executeQuery("select MAx(vote_id) from vote_tbl");
-            Rs1.next();
-            VId = Rs1.getInt(1) + 1;
-        } catch (Exception Ex) {
-
-        }
-    }
-
-    private void VoteBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_VoteBtnMouseClicked
-        if (Key == -1) {
-            JOptionPane.showMessageDialog(this, "Select your Candidate!");
-        } else {
-            try {
-                Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
-
-                PreparedStatement check = Con.prepareStatement("SELECT * FROM vote_tbl WHERE v_id = ? AND e_id = ?");
-                check.setInt(1, VotingId);
-                check.setInt(2, ElecId);
-                ResultSet rs = check.executeQuery();
-
-                if (rs.next()) {
-                    JOptionPane.showMessageDialog(this, "You have already voted in this election!");
-                } else {
-                    VCount();
-
-                    PreparedStatement Add = Con.prepareStatement("INSERT INTO vote_tbl (vote_id, e_id, c_id, v_id, society_id) VALUES (?,?,?,?,?)");
-                    Add.setInt(1, VId);
-                    Add.setInt(2, ElecId);
-                    Add.setInt(3, Key);
-                    Add.setInt(4, VotingId);
-                    Add.setInt(5, SocId);
-
-                    Add.executeUpdate();
-                    JOptionPane.showMessageDialog(this, "Vote Counted!");
-                    DisplayCandidates();
-                    VoteBtn.setVisible(false);
-                }
-
-                Con.close();
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
-            }
-        }
-
-
-    }//GEN-LAST:event_VoteBtnMouseClicked
-
-    private void BackBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BackBtnMouseClicked
-        new Login().setVisible(true);
-        this.dispose();
-    }//GEN-LAST:event_BackBtnMouseClicked
+        GetWinner();
+        GetWinnerData();
+        GetVotes();
+        GetPercentage();
+    }//GEN-LAST:event_ElectionsTableMouseClicked
 
     public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(Dashboard.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(Dashboard.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(Dashboard.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(Dashboard.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Voting().setVisible(true);
+                new Dashboard().setVisible(true);
             }
         });
     }
@@ -404,8 +372,9 @@ public class Voting extends javax.swing.JFrame {
     private javax.swing.JButton BackBtn;
     private javax.swing.JLabel CandidateNameLb;
     private javax.swing.JLabel CandidatePictureLb;
-    private javax.swing.JTable CandidatesTable;
-    private javax.swing.JButton VoteBtn;
+    private javax.swing.JTable ElectionsTable;
+    private javax.swing.JLabel PercentageLb;
+    private javax.swing.JLabel VotesLb;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

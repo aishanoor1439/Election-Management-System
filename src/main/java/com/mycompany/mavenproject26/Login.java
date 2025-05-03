@@ -186,16 +186,6 @@ public class Login extends javax.swing.JFrame {
             }
     }//GEN-LAST:event_LoginButtonMouseClicked
 
-    
-
-    
-
-    
-
-    
-
-    
-
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
