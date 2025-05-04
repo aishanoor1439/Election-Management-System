@@ -160,7 +160,7 @@ public class Login extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(this, "Missing Credentials!");
 
             } else if (NameTextField.getText().equals("Admin") && PasswordField.getText().equals("Password")) {
-                new Candidates().setVisible(true);
+                new Menu().setVisible(true);
                 this.dispose();
             } else {
                 JOptionPane.showMessageDialog(this, "Wrong Credentials Provided!");

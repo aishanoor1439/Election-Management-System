@@ -329,6 +329,11 @@ public class Elections extends javax.swing.JFrame {
         BackButton.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         BackButton.setForeground(new java.awt.Color(242, 133, 0));
         BackButton.setText("Back");
+        BackButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                BackButtonMouseClicked(evt);
+            }
+        });
         BackButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 BackButtonActionPerformed(evt);
@@ -586,6 +591,11 @@ public class Elections extends javax.swing.JFrame {
     private void CandSocietyCbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CandSocietyCbActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_CandSocietyCbActionPerformed
+
+    private void BackButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BackButtonMouseClicked
+        new Menu().setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_BackButtonMouseClicked
 
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {

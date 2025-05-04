@@ -129,6 +129,11 @@ public class Voters extends javax.swing.JFrame {
         BackBtn.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         BackBtn.setForeground(new java.awt.Color(242, 133, 0));
         BackBtn.setText("Back");
+        BackBtn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                BackBtnMouseClicked(evt);
+            }
+        });
         BackBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 BackBtnActionPerformed(evt);
@@ -469,6 +474,11 @@ public class Voters extends javax.swing.JFrame {
             }
         } 
     }//GEN-LAST:event_EditBtnMouseClicked
+
+    private void BackBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BackBtnMouseClicked
+        new Menu().setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_BackBtnMouseClicked
 
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
