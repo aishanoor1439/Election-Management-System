@@ -8,7 +8,7 @@ import java.sql.Statement;
 import javax.swing.JOptionPane;
 
 public class Login extends javax.swing.JFrame {
-
+LoginClass loginHelper = new LoginClass();
     public Login() {
         initComponents();
     }
@@ -152,37 +152,47 @@ public class Login extends javax.swing.JFrame {
     }//GEN-LAST:event_NameTextFieldActionPerformed
 
     private void LoginButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_LoginButtonMouseClicked
-        if (ComboBox.getSelectedIndex() == -1) {
-            JOptionPane.showMessageDialog(this, "Select your Role!");
-        } else if (ComboBox.getSelectedIndex() == 0) {
-            if (NameTextField.getText().isEmpty() || PasswordField.getText().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Missing Credentials!");
+     
+    // Create instance of the helper class
+    LoginClass loginHelper = new LoginClass();
 
-            } else if (NameTextField.getText().equals("Admin") && PasswordField.getText().equals("Password")) {
-                new Menu().setVisible(true);
+    String username = NameTextField.getText();
+    String password = new String(PasswordField.getPassword());
+
+    if (ComboBox.getSelectedIndex() == -1) {
+        JOptionPane.showMessageDialog(this, "Select your Role!");
+    } 
+    // Admin Login
+    else if (ComboBox.getSelectedIndex() == 0) {
+        if (username.isEmpty() || password.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Missing Credentials!");
+        } else if (loginHelper.validateAdmin(username, password)) {
+            new Menu().setVisible(true);
+            this.dispose();
+        } else {
+            JOptionPane.showMessageDialog(this, "Wrong Credentials Provided!");
+            NameTextField.setText("");
+            PasswordField.setText("");
+        }
+    } 
+    // Voter Login
+    else {
+        if (username.isEmpty() || password.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Missing Credentials!");
+        } else {
+            int voterId = loginHelper.validateVoter(username, password);
+            if (voterId != -1) {
+                new Voting(voterId).setVisible(true);
                 this.dispose();
             } else {
                 JOptionPane.showMessageDialog(this, "Wrong Credentials Provided!");
                 NameTextField.setText("");
                 PasswordField.setText("");
             }
-        } else {
-            String Query = "select * from voter_tbl where v_name='" + NameTextField.getText() + "' and v_pass='" + PasswordField.getText() + "'";
-            try {
-                Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
-                St = Con.createStatement();
-                Rs = St.executeQuery(Query);
-                if (Rs.next()) {
-                    new Voting(Rs.getInt(1)).setVisible(true);
-                    this.dispose();
-                } else {
-                    JOptionPane.showMessageDialog(this, "Wrong Credentials Provided!");
-                }
-            } catch (Exception e) {
-                JOptionPane.showConfirmDialog(this, e);
-            }
+        }
+    }
 
-            }
+
     }//GEN-LAST:event_LoginButtonMouseClicked
 
     public static void main(String args[]) {
