@@ -8,7 +8,9 @@ import java.sql.Statement;
 import javax.swing.JOptionPane;
 
 public class Login extends javax.swing.JFrame {
-LoginClass loginHelper = new LoginClass();
+
+    LoginClass loginHelper = new LoginClass();
+
     public Login() {
         initComponents();
     }
@@ -152,47 +154,44 @@ LoginClass loginHelper = new LoginClass();
     }//GEN-LAST:event_NameTextFieldActionPerformed
 
     private void LoginButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_LoginButtonMouseClicked
-     
-    // Create instance of the helper class
-    LoginClass loginHelper = new LoginClass();
 
-    String username = NameTextField.getText();
-    String password = new String(PasswordField.getPassword());
+        // Create instance of the helper class
+        LoginClass loginHelper = new LoginClass();
 
-    if (ComboBox.getSelectedIndex() == -1) {
-        JOptionPane.showMessageDialog(this, "Select your Role!");
-    } 
-    // Admin Login
-    else if (ComboBox.getSelectedIndex() == 0) {
-        if (username.isEmpty() || password.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Missing Credentials!");
-        } else if (loginHelper.validateAdmin(username, password)) {
-            new Menu().setVisible(true);
-            this.dispose();
-        } else {
-            JOptionPane.showMessageDialog(this, "Wrong Credentials Provided!");
-            NameTextField.setText("");
-            PasswordField.setText("");
-        }
-    } 
-    // Voter Login
-    else {
-        if (username.isEmpty() || password.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Missing Credentials!");
-        } else {
-            int voterId = loginHelper.validateVoter(username, password);
-            if (voterId != -1) {
-                new Voting(voterId).setVisible(true);
+        String username = NameTextField.getText();
+        String password = new String(PasswordField.getPassword());
+
+        if (ComboBox.getSelectedIndex() == -1) {
+            JOptionPane.showMessageDialog(this, "Select your Role!");
+        } // Admin Login
+        else if (ComboBox.getSelectedIndex() == 0) {
+            if (username.isEmpty() || password.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Missing Credentials!");
+            } else if (loginHelper.validateAdmin(username, password)) {
+                new Menu().setVisible(true);
                 this.dispose();
             } else {
                 JOptionPane.showMessageDialog(this, "Wrong Credentials Provided!");
                 NameTextField.setText("");
                 PasswordField.setText("");
             }
+        } // Voter Login
+        else {
+            if (username.isEmpty() || password.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Missing Credentials!");
+            } else {
+                int voterId = loginHelper.validateVoter(username, password);
+                if (voterId != -1) {
+                    new Voting(voterId).setVisible(true);
+                    this.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Wrong Credentials Provided!");
+                    NameTextField.setText("");
+                    PasswordField.setText("");
+                }
+            }
         }
-    }
-
-
+        
     }//GEN-LAST:event_LoginButtonMouseClicked
 
     public static void main(String args[]) {

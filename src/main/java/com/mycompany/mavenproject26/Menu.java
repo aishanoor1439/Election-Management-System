@@ -1,7 +1,8 @@
-
 package com.mycompany.mavenproject26;
 
 public class Menu extends javax.swing.JFrame {
+
+    MenuClass navigator = new MenuClass();
 
     public Menu() {
         initComponents();
@@ -171,23 +172,19 @@ public class Menu extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabelMouseClicked
-        new Elections().setVisible(true);
-        this.dispose();
+        navigator.openElections(this);
     }//GEN-LAST:event_jLabelMouseClicked
 
     private void jLabel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseClicked
-        new Candidates().setVisible(true);
-        this.dispose();
+        navigator.openCandidates(this);
     }//GEN-LAST:event_jLabel1MouseClicked
 
     private void jLabel3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel3MouseClicked
-        new Voters().setVisible(true);
-        this.dispose();
+        navigator.openVoters(this);;
     }//GEN-LAST:event_jLabel3MouseClicked
 
     private void jLabel4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel4MouseClicked
-        new Dashboard().setVisible(true);
-        this.dispose();
+        navigator.openDashboard(this);
     }//GEN-LAST:event_jLabel4MouseClicked
 
     public static void main(String args[]) {
