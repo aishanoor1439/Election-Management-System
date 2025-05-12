@@ -1,10 +1,6 @@
 package com.mycompany.mavenproject26;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -12,32 +8,34 @@ import net.proteanit.sql.DbUtils;
 
 public class Elections extends javax.swing.JFrame {
 
-    Connection Con = null;
-    PreparedStatement pst = null;
-    ResultSet Ru = null;
-    Statement St = null;
+    private final ElectionLogic logic;
+    private int selectedElectionId = -1;
 
     public Elections() {
         initComponents();
-        DisplayELections();
-        GetSocieties();
+        logic = new ElectionLogic();
+        displayElections();
+        loadSocieties();
     }
 
-    private void GetSocieties() {
+    private void loadSocieties() {
         try {
-            Connection Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
-            Statement St = Con.createStatement();
-
-            ResultSet rsSocieties = St.executeQuery("SELECT society_name FROM society_tbl");
-            while (rsSocieties.next()) {
-                SocietyComboBox.addItem(rsSocieties.getString("society_name"));
+            ResultSet rs = logic.getSocieties();
+            SocietyComboBox.removeAllItems();
+            while (rs.next()) {
+                SocietyComboBox.addItem(rs.getString("society_name"));
             }
-
-            rsSocieties.close();
-            St.close();
-            Con.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Failed to load societies: " + e.getMessage());
+        }
+    }
+
+    private void displayElections() {
+        try {
+            ResultSet rs = logic.getAllElections();
+            ElectionsTable.setModel(DbUtils.resultSetToTableModel(rs));
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Failed to load elections: " + e.getMessage());
         }
     }
 
@@ -485,107 +483,80 @@ public class Elections extends javax.swing.JFrame {
     int EId = 0;
     Statement St1 = null;
     ResultSet Rs1 = null;
-
-    private void ElecCount() {
-        try {
-            St1 = Con.createStatement();
-            Rs1 = St1.executeQuery("select MAx(e_id) from election_tbl");
-            Rs1.next();
-            EId = Rs1.getInt(1) + 1;
-        } catch (Exception Ex) {
-
-        }
+private String formatDate(java.util.Date date) {
+        int day = date.getDate();
+        int month = date.getMonth() + 1; // 0-based
+        int year = date.getYear() + 1900; // starts from 1900
+        return day + "/" + month + "/" + year;
     }
+   
 
-    private void DisplayELections() {
-        try {
-            Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
-            St = Con.createStatement();
-            Ru = St.executeQuery("Select * from election_tbl");
-            ElectionsTable.setModel(DbUtils.resultSetToTableModel(Ru));
-        } catch (SQLException Ex) {
-
-        }
-    }
+    
 
     private void AddButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_AddButtonMouseClicked
-        if (ElectionNameTextBox.getText().isEmpty() || SocietyComboBox.getSelectedIndex() == -1) {
-            JOptionPane.showMessageDialog(this, "Missing Fields!");
-        } else {
-            try {
-                String Day = String.valueOf(ElectionDate.getDate().getDay());
-                String Month = String.valueOf(ElectionDate.getDate().getMonth());
-                String Year = String.valueOf(ElectionDate.getDate().getYear());
-                String EDate = Day + "/" + Month + "/" + Year;
-                ElecCount();
-                Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
-                PreparedStatement Add = Con.prepareStatement("Insert into election_tbl values(?,?,?,?)");
-                Add.setInt(1, EId);
-                Add.setString(2, ElectionNameTextBox.getText());
-                Add.setString(3, SocietyComboBox.getSelectedItem().toString());
-                Add.setString(4, EDate);
-                int row = Add.executeUpdate();
-                JOptionPane.showMessageDialog(this, "Election Added Successfully!");
-                Con.close();
-                DisplayELections();
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(this, e);
+       try {
+            if (ElectionNameTextBox.getText().isEmpty() || SocietyComboBox.getSelectedIndex() == -1 || ElectionDate.getDate() == null) {
+                JOptionPane.showMessageDialog(this, "Missing Fields!");
+                return;
             }
+
+            int id = logic.getNextElectionId();
+            String name = ElectionNameTextBox.getText();
+            String society = SocietyComboBox.getSelectedItem().toString();
+            String date = formatDate(ElectionDate.getDate());
+
+            logic.addElection(id, name, society, date);
+            JOptionPane.showMessageDialog(this, "Election Added Successfully!");
+            displayElections();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
         }
     }//GEN-LAST:event_AddButtonMouseClicked
 
     int Key = -1;
     private void ElectionsTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ElectionsTableMouseClicked
+         int row = ElectionsTable.getSelectedRow();
         DefaultTableModel model = (DefaultTableModel) ElectionsTable.getModel();
-        int MyIndex = ElectionsTable.getSelectedRow();
-        Key = Integer.valueOf(model.getValueAt(MyIndex, 0).toString());
-        ElectionNameTextBox.setText(model.getValueAt(MyIndex, 1).toString());
-        SocietyComboBox.setSelectedItem(model.getValueAt(MyIndex, 2).toString());
+        selectedElectionId = Integer.parseInt(model.getValueAt(row, 0).toString());
+        ElectionNameTextBox.setText(model.getValueAt(row, 1).toString());
+        SocietyComboBox.setSelectedItem(model.getValueAt(row, 2).toString());
+        // Date parsing can be added here if needed
     }//GEN-LAST:event_ElectionsTableMouseClicked
 
     private void DeleteButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_DeleteButtonMouseClicked
-        if (Key == -1) {
-            JOptionPane.showMessageDialog(this, "Select The Election To Be Deleted!");
-        } else {
-            try {
-                Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
-                String Query = "Delete from election_tbl where e_id=" + Key;
-                Statement Del = Con.createStatement();
-                Del.executeUpdate(Query);
-                JOptionPane.showMessageDialog(this, "Election Deleted Successfilly!");
-                DisplayELections();
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(this, e);
+        try {
+            if (selectedElectionId == -1) {
+                JOptionPane.showMessageDialog(this, "Select an election to delete!");
+                return;
             }
+
+            logic.deleteElection(selectedElectionId);
+            JOptionPane.showMessageDialog(this, "Election Deleted Successfully!");
+            displayElections();
+            selectedElectionId = -1;
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
         }
     }//GEN-LAST:event_DeleteButtonMouseClicked
 
     private void EditButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_EditButtonMouseClicked
-        if (Key == -1 || ElectionDate.getDate().toString().isEmpty() || SocietyComboBox.getSelectedIndex() == -1) {
-            JOptionPane.showMessageDialog(this, "Missing Information!");
-        } else {
-            try {
-                String Day = String.valueOf(ElectionDate.getDate().getDay());
-                String Month = String.valueOf(ElectionDate.getDate().getMonth());
-                String Year = String.valueOf(ElectionDate.getDate().getYear());
-                String EDate = Day + "/" + Month + "/" + Year;
-                Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
-                String Query = "Update election_tbl set e_name=?, e_society=?, e_date=? where e_id=?";
-                PreparedStatement UpdateQuery = Con.prepareStatement(Query);
-                UpdateQuery.setString(1, ElectionNameTextBox.getText());
-                UpdateQuery.setString(2, SocietyComboBox.getSelectedItem().toString());
-                UpdateQuery.setString(3, EDate);
-                UpdateQuery.setInt(4, Key);
-                if (UpdateQuery.executeUpdate() == 1) {
-                    JOptionPane.showMessageDialog(this, "Election Updated Successfilly!");
-                    DisplayELections();
-                } else {
-                    JOptionPane.showMessageDialog(this, "Missing Information!");
-                }
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(this, e);
+        try {
+            if (selectedElectionId == -1 || ElectionNameTextBox.getText().isEmpty() || ElectionDate.getDate() == null || SocietyComboBox.getSelectedIndex() == -1) {
+                JOptionPane.showMessageDialog(this, "Missing Information!");
+                return;
             }
+
+            String name = ElectionNameTextBox.getText();
+            String society = SocietyComboBox.getSelectedItem().toString();
+            String date = formatDate(ElectionDate.getDate());
+
+            logic.updateElection(selectedElectionId, name, society, date);
+            JOptionPane.showMessageDialog(this, "Election Updated Successfully!");
+            displayElections();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
         }
+        
     }//GEN-LAST:event_EditButtonMouseClicked
 
     private void CandSocietyCbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CandSocietyCbActionPerformed
