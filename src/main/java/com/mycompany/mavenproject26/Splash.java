@@ -23,20 +23,24 @@ public class Splash extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
 
+        jPanel1.setBackground(new java.awt.Color(238, 238, 228));
+
         jLabel1.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 18)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(102, 0, 0));
+        jLabel1.setForeground(new java.awt.Color(43, 27, 93));
         jLabel1.setText("%");
 
+        jProgressBar1.setBackground(new java.awt.Color(43, 27, 93));
+        jProgressBar1.setForeground(new java.awt.Color(238, 238, 228));
+
         jLabel2.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 24)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(155, 17, 63));
+        jLabel2.setForeground(new java.awt.Color(43, 27, 93));
         jLabel2.setText("Election Management System");
 
         jLabel3.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 14)); // NOI18N
-        jLabel3.setForeground(new java.awt.Color(155, 17, 63));
+        jLabel3.setForeground(new java.awt.Color(43, 27, 93));
         jLabel3.setText("Loading Modules...");
 
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel4.setIcon(new javax.swing.ImageIcon("C:\\Users\\ABC\\Documents\\NetBeansProjects\\mavenproject26\\Election-Management-System\\voting-box.png")); // NOI18N
         jLabel4.setText("jLabel4");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -60,8 +64,8 @@ public class Splash extends javax.swing.JFrame {
                         .addGap(0, 124, Short.MAX_VALUE)))
                 .addContainerGap())
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(224, 224, 224)
-                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(68, 68, 68)
+                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 261, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -69,8 +73,8 @@ public class Splash extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel2)
-                .addGap(39, 39, 39)
-                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 261, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 33, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
