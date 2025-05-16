@@ -483,18 +483,17 @@ public class Elections extends javax.swing.JFrame {
     int EId = 0;
     Statement St1 = null;
     ResultSet Rs1 = null;
-private String formatDate(java.util.Date date) {
+
+    private String formatDate(java.util.Date date) {
         int day = date.getDate();
         int month = date.getMonth() + 1; // 0-based
         int year = date.getYear() + 1900; // starts from 1900
         return day + "/" + month + "/" + year;
     }
-   
 
-    
 
     private void AddButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_AddButtonMouseClicked
-       try {
+        try {
             if (ElectionNameTextBox.getText().isEmpty() || SocietyComboBox.getSelectedIndex() == -1 || ElectionDate.getDate() == null) {
                 JOptionPane.showMessageDialog(this, "Missing Fields!");
                 return;
@@ -515,7 +514,7 @@ private String formatDate(java.util.Date date) {
 
     int Key = -1;
     private void ElectionsTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ElectionsTableMouseClicked
-         int row = ElectionsTable.getSelectedRow();
+        int row = ElectionsTable.getSelectedRow();
         DefaultTableModel model = (DefaultTableModel) ElectionsTable.getModel();
         selectedElectionId = Integer.parseInt(model.getValueAt(row, 0).toString());
         ElectionNameTextBox.setText(model.getValueAt(row, 1).toString());
@@ -556,7 +555,7 @@ private String formatDate(java.util.Date date) {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
         }
-        
+
     }//GEN-LAST:event_EditButtonMouseClicked
 
     private void CandSocietyCbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CandSocietyCbActionPerformed

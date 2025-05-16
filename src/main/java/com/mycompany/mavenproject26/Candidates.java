@@ -12,6 +12,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import net.proteanit.sql.DbUtils;
 import java.awt.Image;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,10 +22,34 @@ import javax.swing.table.DefaultTableModel;
 
 public class Candidates extends javax.swing.JFrame {
 
+    private CandidateLogic logic;
+    private String imgpath = null;
+    private int selectedCandidateId = -1;
+
     public Candidates() {
         initComponents();
-        GetElectionsAndSocieties();
-        DisplayCandidates();
+        logic = new CandidateLogic();
+        displayCandidates();
+        GetSocieties();
+    }
+
+    private void displayCandidates() {
+        try {
+            ResultSet rs = logic.getCandidates();
+            DefaultTableModel model = (DefaultTableModel) CandidateTable.getModel();
+            model.setRowCount(0); // Clear the table
+            while (rs.next()) {
+                model.addRow(new Object[]{
+                    rs.getString("c_id"),
+                    rs.getString("c_name"),
+                    rs.getString("c_gen"),
+                    rs.getString("c_society"),
+                    rs.getString("c_election")
+                });
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error fetching candidates.");
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -33,7 +58,7 @@ public class Candidates extends javax.swing.JFrame {
     ResultSet Ru = null;
     Statement St = null;
 
-    private void GetElectionsAndSocieties() {
+    private void GetSocieties() {
         try {
             Connection Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
             Statement St = Con.createStatement();
@@ -50,7 +75,6 @@ public class Candidates extends javax.swing.JFrame {
                 CandSocietyCb.addItem(rsSocieties.getString("society_name"));
             }
 
-            rsElections.close();
             rsSocieties.close();
             St.close();
             Con.close();
@@ -181,13 +205,13 @@ public class Candidates extends javax.swing.JFrame {
 
         CandidateTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
             },
             new String [] {
-                "Name", "Gender", "Photo", "Election"
+                "ID", "Name", "Gender", "Society", "Election"
             }
         ));
         CandidateTable.setSelectionBackground(new java.awt.Color(242, 133, 0));
@@ -395,8 +419,6 @@ public class Candidates extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_BrowseBtnActionPerformed
 
-    String imgpath = null;
-
     public ImageIcon ResizePhoto(String ImgPath, byte[] pic, javax.swing.JLabel label) {
         ImageIcon MyImage = null;
 
@@ -411,7 +433,6 @@ public class Candidates extends javax.swing.JFrame {
         return new ImageIcon(newImg);
     }
 
-
     private void BrowseBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BrowseBtnMouseClicked
         JFileChooser chooser = new JFileChooser();
         chooser.setCurrentDirectory(new File(System.getProperty("user.home")));
@@ -420,22 +441,10 @@ public class Candidates extends javax.swing.JFrame {
         int result = chooser.showSaveDialog(null);
         if (result == JFileChooser.APPROVE_OPTION) {
             File selectedFile = chooser.getSelectedFile();
-            String path = selectedFile.getAbsolutePath();
-            CandPictureLb.setIcon(ResizePhoto(path, null, CandPictureLb));
-            imgpath = path;
+            imgpath = selectedFile.getAbsolutePath();
+            CandPictureLb.setIcon(new ImageIcon(new ImageIcon(imgpath).getImage().getScaledInstance(CandPictureLb.getWidth(), CandPictureLb.getHeight(), Image.SCALE_SMOOTH)));
         }
     }//GEN-LAST:event_BrowseBtnMouseClicked
-
-    private void DisplayCandidates() {
-        try {
-            Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
-            St = Con.createStatement();
-            Ru = St.executeQuery("Select * from candidate_tbl");
-            CandidateTable.setModel(DbUtils.resultSetToTableModel(Ru));
-        } catch (SQLException Ex) {
-
-        }
-    }
 
     int CId = 0;
     Statement St1 = null;
@@ -455,25 +464,26 @@ public class Candidates extends javax.swing.JFrame {
     private void AddBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_AddBtnMouseClicked
         if (CandNameTb.getText().isEmpty() || CandGenderCb.getSelectedIndex() == -1 || CandSocietyCb.getSelectedIndex() == -1 || CandElectionCb.getSelectedIndex() == -1) {
             JOptionPane.showMessageDialog(this, "Missing Information!");
-        } else {
+        } else if (imgpath != null) {
+            boolean success = false;
             try {
-                CandCount();
-                Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
-                InputStream img = new FileInputStream(imgpath);
-                PreparedStatement Add = Con.prepareStatement("INSERT INTO candidate_tbl (c_id, c_name, c_gen, c_society, c_election, c_photo) VALUES (?, ?, ?, ?, ?, ?)");
-                Add.setInt(1, CId);
-                Add.setString(2, CandNameTb.getText());
-                Add.setString(3, CandGenderCb.getSelectedItem().toString());
-                Add.setString(4, CandSocietyCb.getSelectedItem().toString());
-                Add.setString(5, CandElectionCb.getSelectedItem().toString());
-                Add.setBlob(6, img);
-                int row = Add.executeUpdate();
-                JOptionPane.showMessageDialog(this, "Candidate Registered Successfully!");
-                Con.close();
-                DisplayCandidates();
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, ex);
+                success = logic.addCandidate(CandNameTb.getText(),
+                        CandGenderCb.getSelectedItem().toString(),
+                        CandSocietyCb.getSelectedItem().toString(),
+                        CandElectionCb.getSelectedItem().toString(),
+                        imgpath);
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(Candidates.class.getName()).log(Level.SEVERE, null, ex);
             }
+
+            if (success) {
+                JOptionPane.showMessageDialog(this, "Candidate Registered Successfully!");
+                displayCandidates();
+            } else {
+                JOptionPane.showMessageDialog(this, "Error adding candidate.");
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Please select a photo!");
         }
     }//GEN-LAST:event_AddBtnMouseClicked
 
@@ -495,65 +505,49 @@ public class Candidates extends javax.swing.JFrame {
     }
 
     int Key = -1;
+
     private void CandidateTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_CandidateTableMouseClicked
+        int rowIndex = CandidateTable.getSelectedRow();
         DefaultTableModel model = (DefaultTableModel) CandidateTable.getModel();
-        int MyIndex = CandidateTable.getSelectedRow();
-        Key = Integer.valueOf(model.getValueAt(MyIndex, 0).toString());
-        CandNameTb.setText(model.getValueAt(MyIndex, 1).toString());
-        CandGenderCb.setSelectedItem(model.getValueAt(MyIndex, 2).toString());
-        CandSocietyCb.setSelectedItem(model.getValueAt(MyIndex, 3).toString());
-        CandElectionCb.setSelectedItem(model.getValueAt(MyIndex, 4).toString());
-        FetchPhoto();
+        selectedCandidateId = Integer.parseInt(model.getValueAt(rowIndex, 0).toString());
+        CandNameTb.setText(model.getValueAt(rowIndex, 1).toString());
+        CandGenderCb.setSelectedItem(model.getValueAt(rowIndex, 2).toString());
+        CandSocietyCb.setSelectedItem(model.getValueAt(rowIndex, 3).toString());
+        CandElectionCb.setSelectedItem(model.getValueAt(rowIndex, 4).toString());
+
+        // Fetch photo and display
+        byte[] photo = logic.getCandidatePhoto(selectedCandidateId);
+        if (photo != null) {
+            CandPictureLb.setIcon(new ImageIcon(new ImageIcon(photo).getImage().getScaledInstance(CandPictureLb.getWidth(), CandPictureLb.getHeight(), Image.SCALE_SMOOTH)));
+        }
     }//GEN-LAST:event_CandidateTableMouseClicked
 
     private void DeleteBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_DeleteBtnMouseClicked
-        if (Key == -1) {
-            JOptionPane.showMessageDialog(this, "Select The Candidate To Be Deleted!");
-        } else {
-            try {
-                Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
-                String Query = "Delete from candidate_tbl where c_id=" + Key;
-                Statement Del = Con.createStatement();
-                Del.executeUpdate(Query);
-                JOptionPane.showMessageDialog(this, "Candidate Deleted Successfilly!");
-                DisplayCandidates();
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(this, e);
+        if (selectedCandidateId != -1) {
+            boolean success = logic.deleteCandidate(selectedCandidateId);
+            if (success) {
+                JOptionPane.showMessageDialog(this, "Candidate Deleted Successfully!");
+                displayCandidates();
+            } else {
+                JOptionPane.showMessageDialog(this, "Error deleting candidate.");
             }
+        } else {
+            JOptionPane.showMessageDialog(this, "Select a candidate to delete!");
         }
     }//GEN-LAST:event_DeleteBtnMouseClicked
 
     private void EditBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_EditBtnMouseClicked
-        if (Key == -1 || CandNameTb.getText().isEmpty() || CandGenderCb.getSelectedIndex() == -1 || CandSocietyCb.getSelectedIndex() == -1 || CandElectionCb.getSelectedIndex() == -1) {
-            JOptionPane.showMessageDialog(this, "Missing Information!");
-        } else if (imgpath != null) {
-            try {
-                InputStream img = new FileInputStream(imgpath);
-                Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
-                String Query = "Update candidate_tbl set c_name=?, c_gen=?, c_photo=?, c_society=?, c_election=? where c_id=?";
-                PreparedStatement UpdateQuery = Con.prepareStatement(Query);
-                UpdateQuery.setString(1, CandNameTb.getText());
-                UpdateQuery.setString(2, CandGenderCb.getSelectedItem().toString());
-                UpdateQuery.setBlob(3, img);
-                UpdateQuery.setString(4, CandSocietyCb.getSelectedItem().toString());
-                UpdateQuery.setString(5, CandElectionCb.getSelectedItem().toString());
-                UpdateQuery.setInt(6, Key);
-                if (UpdateQuery.executeUpdate() == 1) {
-                    JOptionPane.showMessageDialog(this, "Candidate Updated Successfully!");
-                    DisplayCandidates();
-                } else {
-                    JOptionPane.showMessageDialog(this, "Missing Information");
-                }
 
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(this, e);
-            }
-        } else {
-            JOptionPane.showMessageDialog(this, "Select Photo!");
-            CandPictureLb.setIcon(null);
-            CandPictureLb.setText("");
-        }
-        imgpath = null;
+        logic.updateCandidate(
+                selectedCandidateId,
+                CandNameTb.getText(),
+                CandGenderCb.getSelectedItem().toString(),
+                CandSocietyCb.getSelectedItem().toString(),
+                CandElectionCb.getSelectedItem().toString()
+        );
+        displayCandidates();
+        JOptionPane.showMessageDialog(this, "Candidate Updated Successfully!");
+
     }//GEN-LAST:event_EditBtnMouseClicked
 
     private void BackBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BackBtnMouseClicked
