@@ -1,9 +1,7 @@
- 
 package com.mycompany.mavenproject26;
 
- 
 public class MenuClass {
- 
+
     public void openElections(Menu menu) {
         new Elections().setVisible(true);
         menu.dispose();
@@ -23,5 +21,4 @@ public class MenuClass {
         new Dashboard().setVisible(true);
         menu.dispose();
     }
-} 
- 
+}

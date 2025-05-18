@@ -23,21 +23,29 @@ import javax.swing.table.DefaultTableModel;
 public class Candidates extends javax.swing.JFrame {
 
     private CandidateLogic logic;
-    private String imgpath = null;
+    Connection Con = null;
+    PreparedStatement pst = null;
+    ResultSet Ru = null;
+    Statement St = null;
+    Statement St1 = null;
+    ResultSet Rs1 = null;
+    int CId = 0;
     private int selectedCandidateId = -1;
+    private String imgpath = null;
+    int Key = -1;
 
     public Candidates() {
         initComponents();
         logic = new CandidateLogic();
         displayCandidates();
-        GetSocieties();
+        GetSocietiesAndElections();
     }
 
     private void displayCandidates() {
         try {
             ResultSet rs = logic.getCandidates();
             DefaultTableModel model = (DefaultTableModel) CandidateTable.getModel();
-            model.setRowCount(0); // Clear the table
+            model.setRowCount(0);
             while (rs.next()) {
                 model.addRow(new Object[]{
                     rs.getString("c_id"),
@@ -53,12 +61,8 @@ public class Candidates extends javax.swing.JFrame {
     }
 
     @SuppressWarnings("unchecked")
-    Connection Con = null;
-    PreparedStatement pst = null;
-    ResultSet Ru = null;
-    Statement St = null;
 
-    private void GetSocieties() {
+    private void GetSocietiesAndElections() {
         try {
             Connection Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
             Statement St = Con.createStatement();
@@ -83,13 +87,38 @@ public class Candidates extends javax.swing.JFrame {
         }
     }
 
+    private void CandCount() {
+        try {
+            St1 = Con.createStatement();
+            Rs1 = St1.executeQuery("select MAx(c_id) from candidate_tbl");
+            Rs1.next();
+            CId = Rs1.getInt(1) + 1;
+        } catch (Exception Ex) {
+
+        }
+    }
+
+    private void FetchPhoto() {
+        String Query = "Select c_photo from candidate_tbl where c_id = " + Key;
+        Statement St;
+        ResultSet Rs;
+        try {
+            Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
+            St = Con.createStatement();
+            Rs = St.executeQuery(Query);
+            if (Rs.next()) {
+                CandPictureLb.setIcon(ResizePhoto(null, Rs.getBytes("c_photo"), CandPictureLb));
+
+            }
+        } catch (Exception e) {
+
+        }
+    }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        jPanel2 = new javax.swing.JPanel();
-        jLabel3 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
@@ -108,47 +137,26 @@ public class Candidates extends javax.swing.JFrame {
         jLabel8 = new javax.swing.JLabel();
         CandPictureLb = new javax.swing.JLabel();
         BrowseBtn = new javax.swing.JButton();
+        jPanel5 = new javax.swing.JPanel();
+        jLabel11 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setUndecorated(true);
-
-        jPanel2.setBackground(new java.awt.Color(242, 133, 0));
-
-        jLabel3.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 24)); // NOI18N
-        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel3.setText("Election Management System");
-
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(263, 263, 263)
-                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 362, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(16, Short.MAX_VALUE)
-                .addComponent(jLabel3)
-                .addContainerGap())
-        );
 
         jLabel2.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 24)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(242, 133, 0));
+        jLabel2.setForeground(new java.awt.Color(42, 31, 91));
         jLabel2.setText("Candidates");
 
         jLabel4.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 18)); // NOI18N
-        jLabel4.setForeground(new java.awt.Color(242, 133, 0));
+        jLabel4.setForeground(new java.awt.Color(42, 31, 91));
         jLabel4.setText("Name");
 
         jLabel5.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 18)); // NOI18N
-        jLabel5.setForeground(new java.awt.Color(242, 133, 0));
+        jLabel5.setForeground(new java.awt.Color(42, 31, 91));
         jLabel5.setText("Gender");
 
-        EditBtn.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        EditBtn.setForeground(new java.awt.Color(242, 133, 0));
+        EditBtn.setBackground(new java.awt.Color(42, 31, 91));
+        EditBtn.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        EditBtn.setForeground(new java.awt.Color(199, 226, 245));
         EditBtn.setText("Edit");
         EditBtn.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -161,8 +169,9 @@ public class Candidates extends javax.swing.JFrame {
             }
         });
 
-        AddBtn.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        AddBtn.setForeground(new java.awt.Color(242, 133, 0));
+        AddBtn.setBackground(new java.awt.Color(42, 31, 91));
+        AddBtn.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        AddBtn.setForeground(new java.awt.Color(199, 226, 245));
         AddBtn.setText("Add");
         AddBtn.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -175,8 +184,9 @@ public class Candidates extends javax.swing.JFrame {
             }
         });
 
-        DeleteBtn.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        DeleteBtn.setForeground(new java.awt.Color(242, 133, 0));
+        DeleteBtn.setBackground(new java.awt.Color(42, 31, 91));
+        DeleteBtn.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        DeleteBtn.setForeground(new java.awt.Color(199, 226, 245));
         DeleteBtn.setText("Delete");
         DeleteBtn.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -189,8 +199,9 @@ public class Candidates extends javax.swing.JFrame {
             }
         });
 
-        BackBtn.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        BackBtn.setForeground(new java.awt.Color(242, 133, 0));
+        BackBtn.setBackground(new java.awt.Color(42, 31, 91));
+        BackBtn.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        BackBtn.setForeground(new java.awt.Color(199, 226, 245));
         BackBtn.setText("Back");
         BackBtn.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -203,6 +214,7 @@ public class Candidates extends javax.swing.JFrame {
             }
         });
 
+        CandidateTable.setForeground(new java.awt.Color(42, 31, 91));
         CandidateTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null},
@@ -214,7 +226,8 @@ public class Candidates extends javax.swing.JFrame {
                 "ID", "Name", "Gender", "Society", "Election"
             }
         ));
-        CandidateTable.setSelectionBackground(new java.awt.Color(242, 133, 0));
+        CandidateTable.setSelectionBackground(new java.awt.Color(199, 226, 245));
+        CandidateTable.setSelectionForeground(new java.awt.Color(42, 31, 91));
         CandidateTable.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 CandidateTableMouseClicked(evt);
@@ -223,7 +236,7 @@ public class Candidates extends javax.swing.JFrame {
         jScrollPane3.setViewportView(CandidateTable);
 
         CandGenderCb.setFont(new java.awt.Font("Microsoft YaHei UI", 0, 14)); // NOI18N
-        CandGenderCb.setForeground(new java.awt.Color(242, 133, 0));
+        CandGenderCb.setForeground(new java.awt.Color(42, 31, 91));
         CandGenderCb.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Male", "Female" }));
         CandGenderCb.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -232,9 +245,10 @@ public class Candidates extends javax.swing.JFrame {
         });
 
         jLabel6.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 18)); // NOI18N
-        jLabel6.setForeground(new java.awt.Color(242, 133, 0));
+        jLabel6.setForeground(new java.awt.Color(42, 31, 91));
         jLabel6.setText("Society");
 
+        CandNameTb.setForeground(new java.awt.Color(42, 31, 91));
         CandNameTb.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 CandNameTbActionPerformed(evt);
@@ -242,7 +256,7 @@ public class Candidates extends javax.swing.JFrame {
         });
 
         CandSocietyCb.setFont(new java.awt.Font("Microsoft YaHei UI", 0, 14)); // NOI18N
-        CandSocietyCb.setForeground(new java.awt.Color(242, 133, 0));
+        CandSocietyCb.setForeground(new java.awt.Color(42, 31, 91));
         CandSocietyCb.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 CandSocietyCbActionPerformed(evt);
@@ -250,11 +264,11 @@ public class Candidates extends javax.swing.JFrame {
         });
 
         jLabel7.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 18)); // NOI18N
-        jLabel7.setForeground(new java.awt.Color(242, 133, 0));
+        jLabel7.setForeground(new java.awt.Color(42, 31, 91));
         jLabel7.setText("Election");
 
         CandElectionCb.setFont(new java.awt.Font("Microsoft YaHei UI", 0, 14)); // NOI18N
-        CandElectionCb.setForeground(new java.awt.Color(242, 133, 0));
+        CandElectionCb.setForeground(new java.awt.Color(42, 31, 91));
         CandElectionCb.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 CandElectionCbActionPerformed(evt);
@@ -262,14 +276,15 @@ public class Candidates extends javax.swing.JFrame {
         });
 
         jLabel8.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 18)); // NOI18N
-        jLabel8.setForeground(new java.awt.Color(242, 133, 0));
+        jLabel8.setForeground(new java.awt.Color(42, 31, 91));
         jLabel8.setText("Photo");
 
         CandPictureLb.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 18)); // NOI18N
         CandPictureLb.setForeground(new java.awt.Color(242, 133, 0));
 
-        BrowseBtn.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        BrowseBtn.setForeground(new java.awt.Color(242, 133, 0));
+        BrowseBtn.setBackground(new java.awt.Color(42, 31, 91));
+        BrowseBtn.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        BrowseBtn.setForeground(new java.awt.Color(199, 226, 245));
         BrowseBtn.setText("Browse");
         BrowseBtn.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -282,11 +297,35 @@ public class Candidates extends javax.swing.JFrame {
             }
         });
 
+        jPanel5.setBackground(new java.awt.Color(42, 31, 91));
+        jPanel5.setForeground(new java.awt.Color(199, 226, 245));
+        jPanel5.setToolTipText("");
+
+        jLabel11.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 24)); // NOI18N
+        jLabel11.setForeground(new java.awt.Color(199, 226, 245));
+        jLabel11.setText("Bahria University Society Polls");
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addGap(260, 260, 260)
+                .addComponent(jLabel11)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel11)
+                .addContainerGap(16, Short.MAX_VALUE))
+        );
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
@@ -323,16 +362,17 @@ public class Candidates extends javax.swing.JFrame {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(228, 228, 228)
                         .addComponent(jLabel2)
-                        .addGap(199, 227, Short.MAX_VALUE))
+                        .addGap(199, 225, Short.MAX_VALUE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(18, 18, 18)
                         .addComponent(jScrollPane3)
                         .addContainerGap())))
+            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
@@ -421,13 +461,11 @@ public class Candidates extends javax.swing.JFrame {
 
     public ImageIcon ResizePhoto(String ImgPath, byte[] pic, javax.swing.JLabel label) {
         ImageIcon MyImage = null;
-
         if (ImgPath != null) {
             MyImage = new ImageIcon(ImgPath);
         } else {
             MyImage = new ImageIcon(pic);
         }
-
         Image img = MyImage.getImage();
         Image newImg = img.getScaledInstance(label.getWidth(), label.getHeight(), Image.SCALE_SMOOTH);
         return new ImageIcon(newImg);
@@ -445,21 +483,6 @@ public class Candidates extends javax.swing.JFrame {
             CandPictureLb.setIcon(new ImageIcon(new ImageIcon(imgpath).getImage().getScaledInstance(CandPictureLb.getWidth(), CandPictureLb.getHeight(), Image.SCALE_SMOOTH)));
         }
     }//GEN-LAST:event_BrowseBtnMouseClicked
-
-    int CId = 0;
-    Statement St1 = null;
-    ResultSet Rs1 = null;
-
-    private void CandCount() {
-        try {
-            St1 = Con.createStatement();
-            Rs1 = St1.executeQuery("select MAx(c_id) from candidate_tbl");
-            Rs1.next();
-            CId = Rs1.getInt(1) + 1;
-        } catch (Exception Ex) {
-
-        }
-    }
 
     private void AddBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_AddBtnMouseClicked
         if (CandNameTb.getText().isEmpty() || CandGenderCb.getSelectedIndex() == -1 || CandSocietyCb.getSelectedIndex() == -1 || CandElectionCb.getSelectedIndex() == -1) {
@@ -487,25 +510,6 @@ public class Candidates extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_AddBtnMouseClicked
 
-    private void FetchPhoto() {
-        String Query = "Select c_photo from candidate_tbl where c_id = " + Key;
-        Statement St;
-        ResultSet Rs;
-        try {
-            Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
-            St = Con.createStatement();
-            Rs = St.executeQuery(Query);
-            if (Rs.next()) {
-                CandPictureLb.setIcon(ResizePhoto(null, Rs.getBytes("c_photo"), CandPictureLb));
-
-            }
-        } catch (Exception e) {
-
-        }
-    }
-
-    int Key = -1;
-
     private void CandidateTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_CandidateTableMouseClicked
         int rowIndex = CandidateTable.getSelectedRow();
         DefaultTableModel model = (DefaultTableModel) CandidateTable.getModel();
@@ -524,6 +528,10 @@ public class Candidates extends javax.swing.JFrame {
 
     private void DeleteBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_DeleteBtnMouseClicked
         if (selectedCandidateId != -1) {
+            int response = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this candidate?", "Confirm Deletion", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+            if (response != JOptionPane.YES_OPTION) {
+                return;
+            }
             boolean success = logic.deleteCandidate(selectedCandidateId);
             if (success) {
                 JOptionPane.showMessageDialog(this, "Candidate Deleted Successfully!");
@@ -537,7 +545,10 @@ public class Candidates extends javax.swing.JFrame {
     }//GEN-LAST:event_DeleteBtnMouseClicked
 
     private void EditBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_EditBtnMouseClicked
-
+        int response = JOptionPane.showConfirmDialog(this, "Are you sure you want to update this candidate?", "Confirm Update", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+        if (response != JOptionPane.YES_OPTION) {
+            return;
+        }
         logic.updateCandidate(
                 selectedCandidateId,
                 CandNameTb.getText(),
@@ -547,7 +558,6 @@ public class Candidates extends javax.swing.JFrame {
         );
         displayCandidates();
         JOptionPane.showMessageDialog(this, "Candidate Updated Successfully!");
-
     }//GEN-LAST:event_EditBtnMouseClicked
 
     private void BackBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BackBtnMouseClicked
@@ -556,7 +566,6 @@ public class Candidates extends javax.swing.JFrame {
     }//GEN-LAST:event_BackBtnMouseClicked
 
     public static void main(String args[]) {
-
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new Candidates().setVisible(true);
@@ -576,15 +585,15 @@ public class Candidates extends javax.swing.JFrame {
     private javax.swing.JTable CandidateTable;
     private javax.swing.JButton DeleteBtn;
     private javax.swing.JButton EditBtn;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel5;
     private javax.swing.JScrollPane jScrollPane3;
     // End of variables declaration//GEN-END:variables
 }

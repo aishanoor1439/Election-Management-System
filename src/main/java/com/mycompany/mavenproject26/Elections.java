@@ -14,7 +14,7 @@ public class Elections extends javax.swing.JFrame {
     public Elections() {
         initComponents();
         logic = new ElectionLogic();
-        displayElections();
+        loadElections();
         loadSocieties();
     }
 
@@ -30,12 +30,21 @@ public class Elections extends javax.swing.JFrame {
         }
     }
 
-    private void displayElections() {
+    private void loadElections() {
         try {
-            ResultSet rs = logic.getAllElections();
-            ElectionsTable.setModel(DbUtils.resultSetToTableModel(rs));
+            ResultSet rs = logic.getElections();
+            DefaultTableModel model = (DefaultTableModel) ElectionsTable.getModel();
+            model.setRowCount(0);
+            while (rs.next()) {
+                model.addRow(new Object[]{
+                    rs.getString("e_id"),
+                    rs.getString("e_name"),
+                    rs.getString("e_society"),
+                    rs.getString("e_date")
+                });
+            }
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Failed to load elections: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, "Error fetching elections.");
         }
     }
 
@@ -60,8 +69,6 @@ public class Elections extends javax.swing.JFrame {
         jButton10 = new javax.swing.JButton();
         CandSocietyCb = new javax.swing.JComboBox<>();
         jPanel1 = new javax.swing.JPanel();
-        jPanel2 = new javax.swing.JPanel();
-        jLabel3 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
@@ -75,6 +82,8 @@ public class Elections extends javax.swing.JFrame {
         ElectionDate = new com.toedter.calendar.JDateChooser();
         jLabel10 = new javax.swing.JLabel();
         SocietyComboBox = new javax.swing.JComboBox<>();
+        jPanel5 = new javax.swing.JPanel();
+        jLabel11 = new javax.swing.JLabel();
 
         jButton1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jButton1.setForeground(new java.awt.Color(242, 133, 0));
@@ -239,51 +248,29 @@ public class Elections extends javax.swing.JFrame {
         });
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setUndecorated(true);
-
-        jPanel2.setBackground(new java.awt.Color(242, 133, 0));
-
-        jLabel3.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 24)); // NOI18N
-        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel3.setText("Election Management System");
-
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(263, 263, 263)
-                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 362, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(275, Short.MAX_VALUE))
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(16, Short.MAX_VALUE)
-                .addComponent(jLabel3)
-                .addContainerGap())
-        );
 
         jLabel2.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 24)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(242, 133, 0));
+        jLabel2.setForeground(new java.awt.Color(42, 31, 91));
         jLabel2.setText("Elections");
 
         jLabel4.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 18)); // NOI18N
-        jLabel4.setForeground(new java.awt.Color(242, 133, 0));
+        jLabel4.setForeground(new java.awt.Color(42, 31, 91));
         jLabel4.setText("Name");
 
         jLabel5.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 18)); // NOI18N
-        jLabel5.setForeground(new java.awt.Color(242, 133, 0));
+        jLabel5.setForeground(new java.awt.Color(42, 31, 91));
         jLabel5.setText("Date");
 
+        ElectionNameTextBox.setForeground(new java.awt.Color(42, 31, 91));
         ElectionNameTextBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 ElectionNameTextBoxActionPerformed(evt);
             }
         });
 
-        EditButton.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        EditButton.setForeground(new java.awt.Color(242, 133, 0));
+        EditButton.setBackground(new java.awt.Color(42, 31, 91));
+        EditButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        EditButton.setForeground(new java.awt.Color(199, 226, 245));
         EditButton.setText("Edit");
         EditButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -296,8 +283,9 @@ public class Elections extends javax.swing.JFrame {
             }
         });
 
-        AddButton.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        AddButton.setForeground(new java.awt.Color(242, 133, 0));
+        AddButton.setBackground(new java.awt.Color(42, 31, 91));
+        AddButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        AddButton.setForeground(new java.awt.Color(199, 226, 245));
         AddButton.setText("Add");
         AddButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -310,8 +298,9 @@ public class Elections extends javax.swing.JFrame {
             }
         });
 
-        DeleteButton.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        DeleteButton.setForeground(new java.awt.Color(242, 133, 0));
+        DeleteButton.setBackground(new java.awt.Color(42, 31, 91));
+        DeleteButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        DeleteButton.setForeground(new java.awt.Color(199, 226, 245));
         DeleteButton.setText("Delete");
         DeleteButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -324,8 +313,9 @@ public class Elections extends javax.swing.JFrame {
             }
         });
 
-        BackButton.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        BackButton.setForeground(new java.awt.Color(242, 133, 0));
+        BackButton.setBackground(new java.awt.Color(42, 31, 91));
+        BackButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        BackButton.setForeground(new java.awt.Color(199, 226, 245));
         BackButton.setText("Back");
         BackButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -338,19 +328,21 @@ public class Elections extends javax.swing.JFrame {
             }
         });
 
+        ElectionsTable.setForeground(new java.awt.Color(42, 31, 91));
         ElectionsTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null}
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
             },
             new String [] {
-                "Name", "Society", "Date"
+                "ID", "Name", "Society", "Date"
             }
         ));
         ElectionsTable.setRowHeight(25);
-        ElectionsTable.setSelectionBackground(new java.awt.Color(242, 133, 0));
+        ElectionsTable.setSelectionBackground(new java.awt.Color(199, 226, 245));
+        ElectionsTable.setSelectionForeground(new java.awt.Color(42, 31, 91));
         ElectionsTable.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 ElectionsTableMouseClicked(evt);
@@ -358,15 +350,43 @@ public class Elections extends javax.swing.JFrame {
         });
         jScrollPane3.setViewportView(ElectionsTable);
 
+        ElectionDate.setForeground(new java.awt.Color(42, 31, 91));
+
         jLabel10.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 18)); // NOI18N
-        jLabel10.setForeground(new java.awt.Color(242, 133, 0));
+        jLabel10.setForeground(new java.awt.Color(42, 31, 91));
         jLabel10.setText("Society");
+
+        SocietyComboBox.setForeground(new java.awt.Color(42, 31, 91));
+
+        jPanel5.setBackground(new java.awt.Color(42, 31, 91));
+        jPanel5.setForeground(new java.awt.Color(199, 226, 245));
+        jPanel5.setToolTipText("");
+
+        jLabel11.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 24)); // NOI18N
+        jLabel11.setForeground(new java.awt.Color(199, 226, 245));
+        jLabel11.setText("Bahria University Society Polls");
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addGap(260, 260, 260)
+                .addComponent(jLabel11)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel11)
+                .addContainerGap(16, Short.MAX_VALUE))
+        );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
@@ -392,13 +412,14 @@ public class Elections extends javax.swing.JFrame {
                                 .addGap(18, 18, 18)
                                 .addComponent(BackButton)))
                         .addGap(18, 18, 18)
-                        .addComponent(jScrollPane3)))
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)))
                 .addContainerGap())
+            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jLabel2)
                 .addGap(18, 18, 18)
@@ -480,17 +501,12 @@ public class Elections extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton10ActionPerformed
 
-    int EId = 0;
-    Statement St1 = null;
-    ResultSet Rs1 = null;
-
     private String formatDate(java.util.Date date) {
         int day = date.getDate();
-        int month = date.getMonth() + 1; // 0-based
-        int year = date.getYear() + 1900; // starts from 1900
+        int month = date.getMonth() + 1;
+        int year = date.getYear() + 1900;
         return day + "/" + month + "/" + year;
     }
-
 
     private void AddButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_AddButtonMouseClicked
         try {
@@ -498,44 +514,43 @@ public class Elections extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(this, "Missing Fields!");
                 return;
             }
-
             int id = logic.getNextElectionId();
             String name = ElectionNameTextBox.getText();
             String society = SocietyComboBox.getSelectedItem().toString();
             String date = formatDate(ElectionDate.getDate());
-
             logic.addElection(id, name, society, date);
             JOptionPane.showMessageDialog(this, "Election Added Successfully!");
-            displayElections();
+            loadElections();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
         }
     }//GEN-LAST:event_AddButtonMouseClicked
 
-    int Key = -1;
     private void ElectionsTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ElectionsTableMouseClicked
         int row = ElectionsTable.getSelectedRow();
         DefaultTableModel model = (DefaultTableModel) ElectionsTable.getModel();
         selectedElectionId = Integer.parseInt(model.getValueAt(row, 0).toString());
         ElectionNameTextBox.setText(model.getValueAt(row, 1).toString());
         SocietyComboBox.setSelectedItem(model.getValueAt(row, 2).toString());
-        // Date parsing can be added here if needed
     }//GEN-LAST:event_ElectionsTableMouseClicked
 
     private void DeleteButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_DeleteButtonMouseClicked
         try {
-            if (selectedElectionId == -1) {
-                JOptionPane.showMessageDialog(this, "Select an election to delete!");
-                return;
-            }
-
-            logic.deleteElection(selectedElectionId);
-            JOptionPane.showMessageDialog(this, "Election Deleted Successfully!");
-            displayElections();
-            selectedElectionId = -1;
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+        if (selectedElectionId == -1) {
+            JOptionPane.showMessageDialog(this, "Select an election to delete!");
+            return;
         }
+        int response = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this election?", "Confirm Deletion", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+        if (response != JOptionPane.YES_OPTION) {
+            return;
+        }
+        logic.deleteElection(selectedElectionId);
+        JOptionPane.showMessageDialog(this, "Election Deleted Successfully!");
+        loadElections();
+        selectedElectionId = -1;
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+    }
     }//GEN-LAST:event_DeleteButtonMouseClicked
 
     private void EditButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_EditButtonMouseClicked
@@ -544,14 +559,16 @@ public class Elections extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(this, "Missing Information!");
                 return;
             }
-
+            int response = JOptionPane.showConfirmDialog(this, "Are you sure you want to update this election?", "Confirm Update", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+            if (response != JOptionPane.YES_OPTION) {
+                return;
+            }
             String name = ElectionNameTextBox.getText();
             String society = SocietyComboBox.getSelectedItem().toString();
             String date = formatDate(ElectionDate.getDate());
-
             logic.updateElection(selectedElectionId, name, society, date);
             JOptionPane.showMessageDialog(this, "Election Updated Successfully!");
-            displayElections();
+            loadElections();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
         }
@@ -592,8 +609,8 @@ public class Elections extends javax.swing.JFrame {
     private javax.swing.JButton jButton9;
     private com.toedter.calendar.JDayChooser jDayChooser3;
     private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
@@ -601,9 +618,9 @@ public class Elections extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTable jTable2;

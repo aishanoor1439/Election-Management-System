@@ -3,7 +3,10 @@ package com.mycompany.mavenproject26;
 import java.sql.*;
 
 public class ElectionLogic {
+
     private Connection con;
+    private Statement St;
+    private ResultSet Rs;
 
     public ElectionLogic() {
         try {
@@ -15,8 +18,7 @@ public class ElectionLogic {
 
     public int getNextElectionId() {
         int id = 0;
-        try (Statement stmt = con.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT MAX(e_id) FROM election_tbl")) {
+        try (Statement stmt = con.createStatement(); ResultSet rs = stmt.executeQuery("SELECT MAX(e_id) FROM election_tbl")) {
             if (rs.next()) {
                 id = rs.getInt(1) + 1;
             }
@@ -26,14 +28,14 @@ public class ElectionLogic {
         return id;
     }
 
-    public ResultSet getAllElections() {
+    public ResultSet getElections() {
         try {
-            Statement stmt = con.createStatement();
-            return stmt.executeQuery("SELECT * FROM election_tbl");
+            St = con.createStatement();
+            Rs = St.executeQuery("SELECT * FROM election_tbl");
         } catch (SQLException e) {
             e.printStackTrace();
-            return null;
         }
+        return Rs;
     }
 
     public ResultSet getSocieties() {

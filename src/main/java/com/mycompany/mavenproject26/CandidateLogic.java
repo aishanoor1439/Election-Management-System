@@ -17,7 +17,6 @@ public class CandidateLogic {
     private ResultSet Rs;
     private PreparedStatement Pst;
 
-    // Constructor to initialize database connection
     public CandidateLogic() {
         try {
             Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
@@ -26,7 +25,6 @@ public class CandidateLogic {
         }
     }
 
-    // Method to get the next candidate ID
     public int getNextCandidateId() {
         int CId = 0;
         try {
@@ -41,7 +39,6 @@ public class CandidateLogic {
         return CId;
     }
 
-    // Method to add a new candidate
     public boolean addCandidate(String name, String gender, String society, String election, String imgPath) throws FileNotFoundException {
         try {
             int CId = getNextCandidateId();
@@ -63,7 +60,6 @@ public class CandidateLogic {
         }
     }
 
-    // Method to fetch all candidates
     public ResultSet getCandidates() {
         try {
             St = Con.createStatement();
@@ -74,7 +70,6 @@ public class CandidateLogic {
         return Rs;
     }
 
-    // Method to fetch photo of a specific candidate
     public byte[] getCandidatePhoto(int cId) {
         byte[] photo = null;
         try {
@@ -90,7 +85,6 @@ public class CandidateLogic {
         return photo;
     }
 
-    // Method to delete a candidate
     public boolean deleteCandidate(int cId) {
         try {
             Pst = Con.prepareStatement("DELETE FROM candidate_tbl WHERE c_id = ?");
@@ -103,7 +97,6 @@ public class CandidateLogic {
         }
     }
 
-    // Method to update a candidate's data
     public boolean updateCandidate(int cId, String name, String gender, String society, String election) {
         try {
             Pst = Con.prepareStatement("UPDATE candidate_tbl SET c_name = ?, c_gen = ?, c_society = ?, c_election = ? WHERE c_id = ?");
