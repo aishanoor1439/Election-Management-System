@@ -16,18 +16,50 @@ import net.proteanit.sql.DbUtils;
 
 public class Voting extends javax.swing.JFrame {
 
+    private VotingLogic logic;
+    Connection Con = null;
+    PreparedStatement pst = null;
+    ResultSet Ru = null;
+    Statement St = null;
+    Statement St1 = null;
+    ResultSet Rs1 = null;
+    int VotingId;
+    int ElecId;
+    int SocId;
+    int VId;
+    int Key = -1;
+
     public Voting() {
         initComponents();
-        DisplayCandidates();
+        this.logic = new VotingLogic();
+        displayCandidates();
     }
 
-    int VotingId;
-
-    public Voting(int VoterId) {
+    public Voting(int voterId) {
         initComponents();
-        DisplayCandidates();
-        VotingId = VoterId;
-//        JOptionPane.showMessageDialog(this, VotingId);
+        this.logic = new VotingLogic();
+        this.VotingId = voterId;
+        displayCandidates();
+    }
+
+    private void displayCandidates() {
+        try {
+            ResultSet rs = logic.getCandidates();
+            DefaultTableModel model = (DefaultTableModel) CandidatesTable.getModel();
+            model.setRowCount(0);
+            while (rs.next()) {
+                model.addRow(new Object[]{
+                    rs.getString("c_id"),
+                    rs.getString("c_name"),
+                    rs.getString("c_gen"),
+                    rs.getString("c_society"),
+                    rs.getString("c_election"),
+                    rs.getString("c_photo")
+                });
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error fetching candidates.");
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -220,22 +252,6 @@ public class Voting extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    Connection Con = null;
-    PreparedStatement pst = null;
-    ResultSet Ru = null;
-    Statement St = null;
-
-    private void DisplayCandidates() {
-        try {
-            Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
-            St = Con.createStatement();
-            Ru = St.executeQuery("Select * from candidate_tbl");
-            CandidatesTable.setModel(DbUtils.resultSetToTableModel(Ru));
-        } catch (SQLException Ex) {
-
-        }
-    }
-
     private void VoteBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_VoteBtnActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_VoteBtnActionPerformed
@@ -275,31 +291,17 @@ public class Voting extends javax.swing.JFrame {
         }
     }
 
-    int Key = -1;
-    int ElecId;
-    int SocId;
-
     private void CandidatesTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_CandidatesTableMouseClicked
-//        DefaultTableModel model = (DefaultTableModel) CandidatesTable.getModel();
-//        int MyIndex = CandidatesTable.getSelectedRow();
-//
-//        Key = Integer.valueOf(model.getValueAt(MyIndex, 0).toString());
-//        SocId = Integer.valueOf(model.getValueAt(MyIndex, 3).toString());
-//        ElecId = Integer.valueOf(model.getValueAt(MyIndex, 4).toString());
-//
-//        FetchPhoto();
         DefaultTableModel model = (DefaultTableModel) CandidatesTable.getModel();
         int MyIndex = CandidatesTable.getSelectedRow();
 
         Key = Integer.valueOf(model.getValueAt(MyIndex, 0).toString());
-
         String societyName = model.getValueAt(MyIndex, 3).toString();
         String electionName = model.getValueAt(MyIndex, 4).toString();
 
-        SocId = getSocietyIdByName(societyName);
-        ElecId = getElectionIdByName(electionName);
-
-        FetchPhoto();
+        SocId = logic.getSocietyIdByName(societyName);
+        ElecId = logic.getElectionIdByName(electionName);
+        CandidatePictureLb.setIcon(logic.fetchPhoto(Key, CandidatePictureLb));
     }//GEN-LAST:event_CandidatesTableMouseClicked
 
     private int getSocietyIdByName(String name) {
@@ -339,10 +341,6 @@ public class Voting extends javax.swing.JFrame {
         return id;
     }
 
-    int VId = 0;
-    Statement St1 = null;
-    ResultSet Rs1 = null;
-
     private void VCount() {
         try {
             St1 = Con.createStatement();
@@ -357,40 +355,19 @@ public class Voting extends javax.swing.JFrame {
     private void VoteBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_VoteBtnMouseClicked
         if (Key == -1) {
             JOptionPane.showMessageDialog(this, "Select your Candidate!");
+        } else if (logic.hasAlreadyVoted(VotingId, ElecId)) {
+            JOptionPane.showMessageDialog(this, "You have already voted in this election!");
         } else {
-            try {
-                Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
-
-                PreparedStatement check = Con.prepareStatement("SELECT * FROM vote_tbl WHERE v_id = ? AND e_id = ?");
-                check.setInt(1, VotingId);
-                check.setInt(2, ElecId);
-                ResultSet rs = check.executeQuery();
-
-                if (rs.next()) {
-                    JOptionPane.showMessageDialog(this, "You have already voted in this election!");
-                } else {
-                    VCount();
-
-                    PreparedStatement Add = Con.prepareStatement("INSERT INTO vote_tbl (vote_id, e_id, c_id, v_id, society_id) VALUES (?,?,?,?,?)");
-                    Add.setInt(1, VId);
-                    Add.setInt(2, ElecId);
-                    Add.setInt(3, Key);
-                    Add.setInt(4, VotingId);
-                    Add.setInt(5, SocId);
-
-                    Add.executeUpdate();
-                    JOptionPane.showMessageDialog(this, "Vote Counted!");
-                    DisplayCandidates();
-                    VoteBtn.setVisible(false);
-                }
-
-                Con.close();
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+            VId = logic.getNextVoteId();
+            boolean voted = logic.vote(VId, ElecId, Key, VotingId, SocId);
+            if (voted) {
+                JOptionPane.showMessageDialog(this, "Vote Counted!");
+                displayCandidates();
+                VoteBtn.setVisible(false);
+            } else {
+                JOptionPane.showMessageDialog(this, "Voting failed!");
             }
         }
-
-
     }//GEN-LAST:event_VoteBtnMouseClicked
 
     private void BackBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BackBtnMouseClicked
