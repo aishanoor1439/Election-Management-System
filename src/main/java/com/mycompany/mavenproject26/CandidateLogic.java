@@ -97,20 +97,38 @@ public class CandidateLogic {
         }
     }
 
-    public boolean updateCandidate(int cId, String name, String gender, String society, String election) {
-        try {
-            Pst = Con.prepareStatement("UPDATE candidate_tbl SET c_name = ?, c_gen = ?, c_society = ?, c_election = ? WHERE c_id = ?");
-            Pst.setString(1, name);
-            Pst.setString(2, gender);
-            Pst.setString(3, society);
-            Pst.setString(4, election);
-            Pst.setInt(5, cId);
-            int rows = Pst.executeUpdate();
-            return rows > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
+    public boolean updateCandidate(int cId, String name, String gender, String society, String election, Object imgPath) {
+    try {
+        if (imgPath == null) {
+            System.out.println("Error: Image path is empty.");
             return false;
         }
+        InputStream img = new FileInputStream((String) imgPath);
+        PreparedStatement pst = Con.prepareStatement("UPDATE candidate_tbl SET c_name = ?, c_gen = ?, c_society = ?, c_election = ?, c_photo = ? WHERE c_id = ?");
+        pst.setString(1, name);
+        pst.setString(2, gender);
+        pst.setString(3, society);
+        pst.setString(4, election);
+        pst.setBlob(5, img);
+        pst.setInt(6, cId);
+        int rows = pst.executeUpdate();
+        return rows > 0;
+    } catch (SQLException | FileNotFoundException e) {
+        e.printStackTrace();
+        return false;
     }
+}
 
+    
+public byte[] fetchCandidatePhoto(int id) {
+        String query = "SELECT c_photo FROM candidate_tbl WHERE c_id = " + id;
+        try (Statement st = Con.createStatement(); ResultSet rs = st.executeQuery(query)) {
+            if (rs.next()) {
+                return rs.getBytes("c_photo");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

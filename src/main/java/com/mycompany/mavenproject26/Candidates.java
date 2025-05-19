@@ -518,8 +518,6 @@ public class Candidates extends javax.swing.JFrame {
         CandGenderCb.setSelectedItem(model.getValueAt(rowIndex, 2).toString());
         CandSocietyCb.setSelectedItem(model.getValueAt(rowIndex, 3).toString());
         CandElectionCb.setSelectedItem(model.getValueAt(rowIndex, 4).toString());
-
-        // Fetch photo and display
         byte[] photo = logic.getCandidatePhoto(selectedCandidateId);
         if (photo != null) {
             CandPictureLb.setIcon(new ImageIcon(new ImageIcon(photo).getImage().getScaledInstance(CandPictureLb.getWidth(), CandPictureLb.getHeight(), Image.SCALE_SMOOTH)));
@@ -545,19 +543,33 @@ public class Candidates extends javax.swing.JFrame {
     }//GEN-LAST:event_DeleteBtnMouseClicked
 
     private void EditBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_EditBtnMouseClicked
-        int response = JOptionPane.showConfirmDialog(this, "Are you sure you want to update this candidate?", "Confirm Update", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-        if (response != JOptionPane.YES_OPTION) {
-            return;
-        }
-        logic.updateCandidate(
-                selectedCandidateId,
-                CandNameTb.getText(),
-                CandGenderCb.getSelectedItem().toString(),
-                CandSocietyCb.getSelectedItem().toString(),
-                CandElectionCb.getSelectedItem().toString()
+        Object imgPath = null;
+    if (selectedCandidateId == -1) {
+        JOptionPane.showMessageDialog(this, "Missing Information: Candidate ID not selected!");
+        return;
+    }
+    JFileChooser fileChooser = new JFileChooser();
+    int returnVal = fileChooser.showOpenDialog(this);
+    if (returnVal == JFileChooser.APPROVE_OPTION) {
+        File selectedFile = fileChooser.getSelectedFile();
+        imgPath = selectedFile.getAbsolutePath();
+        boolean success = logic.updateCandidate(
+            selectedCandidateId,
+            CandNameTb.getText(),
+            CandGenderCb.getSelectedItem().toString(),
+            CandSocietyCb.getSelectedItem().toString(),
+            CandElectionCb.getSelectedItem().toString(),
+            imgPath
         );
-        displayCandidates();
-        JOptionPane.showMessageDialog(this, "Candidate Updated Successfully!");
+        if (success) {
+            displayCandidates();
+            JOptionPane.showMessageDialog(this, "Candidate Updated Successfully!");
+        } else {
+            JOptionPane.showMessageDialog(this, "Update Failed. Please check the information.");
+        }
+    } else {
+        JOptionPane.showMessageDialog(this, "No photo selected. Please choose an image.");
+    }
     }//GEN-LAST:event_EditBtnMouseClicked
 
     private void BackBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BackBtnMouseClicked
