@@ -1,18 +1,14 @@
 package com.mycompany.mavenproject26;
 
 import java.awt.Image;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
-import net.proteanit.sql.DbUtils;
 
 public class Voting extends javax.swing.JFrame {
 
@@ -43,26 +39,41 @@ public class Voting extends javax.swing.JFrame {
     }
 
     private void displayCandidates() {
+    try {
+        
+        String societyName = "";
+        String electionName = "";
 
-        try {
-            ResultSet rs = logic.getCandidates();
-            DefaultTableModel model = (DefaultTableModel) CandidatesTable.getModel();
-            model.setRowCount(0);
-            while (rs.next()) {
-                model.addRow(new Object[]{
-                    rs.getString("c_id"),
-                    rs.getString("c_name"),
-                    rs.getString("c_gen"),
-                    rs.getString("c_society"),
-                    rs.getString("c_election"),
-                    rs.getString("c_photo")
-                });
-            }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error fetching candidates.");
+        Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
+        pst = Con.prepareStatement("SELECT v_society, v_election FROM voter_tbl WHERE v_id = ?");
+        pst.setInt(1, VotingId);
+        ResultSet rsSoc = pst.executeQuery();
+        if (rsSoc.next()) {
+            societyName = rsSoc.getString("v_society").trim();
+            electionName = rsSoc.getString("v_election").trim();
         }
 
+        ResultSet rs = logic.getCandidatesBySocietyAndElection(societyName, electionName);
+
+        DefaultTableModel model = (DefaultTableModel) CandidatesTable.getModel();
+        model.setRowCount(0);
+        while (rs.next()) {
+            model.addRow(new Object[]{
+                rs.getString("c_id"),
+                rs.getString("c_name"),
+                rs.getString("c_gen"),
+                rs.getString("c_society"),
+                rs.getString("c_election"),
+                rs.getString("c_photo")
+            });
+        }
+
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Error fetching candidates.");
+        e.printStackTrace();
     }
+}
+
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents

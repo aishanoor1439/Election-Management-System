@@ -3,7 +3,6 @@ package com.mycompany.mavenproject26;
 import java.awt.Image;
 import java.sql.*;
 import javax.swing.*;
-import net.proteanit.sql.DbUtils;
 
 public class VotingLogic extends AbstractBUSPs {
 
@@ -17,6 +16,22 @@ public class VotingLogic extends AbstractBUSPs {
         }
     }
 
+    public ResultSet getCandidatesBySocietyAndElection(String societyName, String electionName) {
+    try {
+        PreparedStatement pst = Con.prepareStatement(
+            "SELECT * FROM candidate_tbl WHERE c_society = ? AND c_election = ?"
+        );
+        pst.setString(1, societyName.trim());
+        pst.setString(2, electionName.trim());
+        return pst.executeQuery();
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    
+    return null;
+}
+
+    
     public ResultSet getCandidates() {
 
         try {
