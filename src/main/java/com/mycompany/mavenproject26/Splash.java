@@ -99,6 +99,7 @@ public class Splash extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     public static void main(String args[]) {
+        
         Splash splash = new Splash();
         splash.setVisible(true);
 

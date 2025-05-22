@@ -1,14 +1,13 @@
 package com.mycompany.mavenproject26;
 
 import java.sql.ResultSet;
-import java.sql.Statement;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
-import net.proteanit.sql.DbUtils;
 
 public class Elections extends javax.swing.JFrame {
 
     private final ElectionLogic logic;
+    ResultSet rs = null;
     private int selectedElectionId = -1;
 
     public Elections() {
@@ -19,8 +18,9 @@ public class Elections extends javax.swing.JFrame {
     }
 
     private void loadSocieties() {
+
         try {
-            ResultSet rs = logic.getSocieties();
+            rs = logic.getSocieties();
             SocietyComboBox.removeAllItems();
             while (rs.next()) {
                 SocietyComboBox.addItem(rs.getString("society_name"));
@@ -28,11 +28,13 @@ public class Elections extends javax.swing.JFrame {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Failed to load societies: " + e.getMessage());
         }
+
     }
 
     private void loadElections() {
+
         try {
-            ResultSet rs = logic.getElections();
+            rs = logic.getElections();
             DefaultTableModel model = (DefaultTableModel) ElectionsTable.getModel();
             model.setRowCount(0);
             while (rs.next()) {
@@ -46,6 +48,7 @@ public class Elections extends javax.swing.JFrame {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error fetching elections.");
         }
+
     }
 
     @SuppressWarnings("unchecked")
@@ -502,13 +505,16 @@ public class Elections extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton10ActionPerformed
 
     private String formatDate(java.util.Date date) {
+        
         int day = date.getDate();
         int month = date.getMonth() + 1;
         int year = date.getYear() + 1900;
         return day + "/" + month + "/" + year;
+        
     }
 
     private void AddButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_AddButtonMouseClicked
+
         try {
             if (ElectionNameTextBox.getText().isEmpty() || SocietyComboBox.getSelectedIndex() == -1 || ElectionDate.getDate() == null) {
                 JOptionPane.showMessageDialog(this, "Missing Fields!");
@@ -524,42 +530,48 @@ public class Elections extends javax.swing.JFrame {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
         }
+        
     }//GEN-LAST:event_AddButtonMouseClicked
 
     private void ElectionsTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ElectionsTableMouseClicked
+
         int row = ElectionsTable.getSelectedRow();
         DefaultTableModel model = (DefaultTableModel) ElectionsTable.getModel();
         selectedElectionId = Integer.parseInt(model.getValueAt(row, 0).toString());
         ElectionNameTextBox.setText(model.getValueAt(row, 1).toString());
         SocietyComboBox.setSelectedItem(model.getValueAt(row, 2).toString());
+
     }//GEN-LAST:event_ElectionsTableMouseClicked
 
     private void DeleteButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_DeleteButtonMouseClicked
+        
         try {
-        if (selectedElectionId == -1) {
-            JOptionPane.showMessageDialog(this, "Select an election to delete!");
-            return;
+            if (selectedElectionId == -1) {
+                JOptionPane.showMessageDialog(this, "Select an election to delete!");
+                return;
+            }
+            int response = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this election?", "Confirm Deletion", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+            if (response != JOptionPane.YES_OPTION) {
+                return;
+            }
+            logic.deleteElection(selectedElectionId);
+            JOptionPane.showMessageDialog(this, "Election Deleted Successfully!");
+            loadElections();
+            selectedElectionId = -1;
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
         }
-        int response = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this election?", "Confirm Deletion", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-        if (response != JOptionPane.YES_OPTION) {
-            return;
-        }
-        logic.deleteElection(selectedElectionId);
-        JOptionPane.showMessageDialog(this, "Election Deleted Successfully!");
-        loadElections();
-        selectedElectionId = -1;
-    } catch (Exception e) {
-        JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
-    }
+        
     }//GEN-LAST:event_DeleteButtonMouseClicked
 
     private void EditButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_EditButtonMouseClicked
+        
         try {
             if (selectedElectionId == -1 || ElectionNameTextBox.getText().isEmpty() || ElectionDate.getDate() == null || SocietyComboBox.getSelectedIndex() == -1) {
                 JOptionPane.showMessageDialog(this, "Missing Information!");
                 return;
             }
-            int response = JOptionPane.showConfirmDialog(this, "Are you sure you want to update this election?", "Confirm Update", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+            int response = JOptionPane.showConfirmDialog(this, "Are you sure you want to update this election?", "Confirm Update", JOptionPane.YES_NO_OPTION);
             if (response != JOptionPane.YES_OPTION) {
                 return;
             }

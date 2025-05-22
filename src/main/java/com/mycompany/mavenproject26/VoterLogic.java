@@ -5,12 +5,9 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import net.proteanit.sql.DbUtils;
 
-public class VoterLogic {
+public class VoterLogic extends AbstractBUSPs {
 
-    Connection Con;
-    Statement St, St1;
-    PreparedStatement pst;
-    ResultSet Rs, Ru, Rs1;
+    int VId = 0;
 
     public VoterLogic() {
         try {
@@ -21,39 +18,41 @@ public class VoterLogic {
     }
 
     public void GetElectionsAndSocieties(JComboBox<String> VElectionCb, JComboBox<String> VSocietyCb) {
-        try {
-            Statement St = Con.createStatement();
 
+        try {
+            St = Con.createStatement();
             ResultSet rsElections = St.executeQuery("SELECT e_name FROM election_tbl");
             while (rsElections.next()) {
                 VElectionCb.addItem(rsElections.getString("e_name"));
             }
-
             ResultSet rsSocieties = St.executeQuery("SELECT society_name FROM society_tbl");
             while (rsSocieties.next()) {
                 VSocietyCb.addItem(rsSocieties.getString("society_name"));
             }
-
             rsElections.close();
             rsSocieties.close();
             St.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
+
     }
 
     public ResultSet getVoters() {
+
         try {
             St = Con.createStatement();
             Rs = St.executeQuery("SELECT * FROM voter_tbl");
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        
         return Rs;
+
     }
 
     public int GetNextVoterId() {
-        int VId = 0;
+        
         try {
             St1 = Con.createStatement();
             Rs1 = St1.executeQuery("SELECT MAX(v_id) FROM voter_tbl");
@@ -63,10 +62,13 @@ public class VoterLogic {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        
         return VId;
+        
     }
 
     public boolean addVoter(String name, String gender, String society, String election, String password) {
+        
         try {
             PreparedStatement Add = Con.prepareStatement("INSERT INTO voter_tbl (v_name, v_gen, v_society, v_election, v_pass) VALUES (?, ?, ?, ?, ?)");
             Add.setString(1, name);
@@ -78,10 +80,13 @@ public class VoterLogic {
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, e);
         }
+        
         return true;
+        
     }
 
     public boolean deleteVoter(int VoterId) {
+        
         try {
             String Query = "DELETE FROM voter_tbl WHERE v_id=" + VoterId;
             Statement Del = Con.createStatement();
@@ -89,10 +94,13 @@ public class VoterLogic {
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, e);
         }
+        
         return true;
+        
     }
 
     public boolean updateVoter(int VoterId, String name, String gender, String society, String election, String password) {
+        
         try {
             String Query = "UPDATE voter_tbl SET v_name=?, v_gen=?, v_society=?, v_election=?, v_pass=? WHERE v_id=?";
             PreparedStatement UpdateQuery = Con.prepareStatement(Query);
@@ -106,6 +114,9 @@ public class VoterLogic {
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, e);
         }
+        
         return true;
+        
     }
+    
 }

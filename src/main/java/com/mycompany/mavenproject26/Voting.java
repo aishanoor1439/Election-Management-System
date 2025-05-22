@@ -19,15 +19,15 @@ public class Voting extends javax.swing.JFrame {
     private VotingLogic logic;
     Connection Con = null;
     PreparedStatement pst = null;
-    ResultSet Ru = null;
-    Statement St = null;
-    Statement St1 = null;
-    ResultSet Rs1 = null;
+    ResultSet Ru, Rs, Rs1 = null;
+    Statement St, St1 = null;
+    int id = -1;
     int VotingId;
     int ElecId;
     int SocId;
     int VId;
     int Key = -1;
+    ImageIcon MyImage = null;
 
     public Voting() {
         initComponents();
@@ -43,6 +43,7 @@ public class Voting extends javax.swing.JFrame {
     }
 
     private void displayCandidates() {
+
         try {
             ResultSet rs = logic.getCandidates();
             DefaultTableModel model = (DefaultTableModel) CandidatesTable.getModel();
@@ -60,6 +61,7 @@ public class Voting extends javax.swing.JFrame {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error fetching candidates.");
         }
+
     }
 
     @SuppressWarnings("unchecked")
@@ -262,7 +264,6 @@ public class Voting extends javax.swing.JFrame {
     }//GEN-LAST:event_BackBtnActionPerformed
 
     public ImageIcon ResizePhoto(String ImgPath, byte[] pic, javax.swing.JLabel label) {
-        ImageIcon MyImage = null;
 
         if (ImgPath != null) {
             MyImage = new ImageIcon(ImgPath);
@@ -276,9 +277,8 @@ public class Voting extends javax.swing.JFrame {
     }
 
     private void FetchPhoto() {
+
         String Query = "Select c_photo from candidate_tbl where c_id = " + Key;
-        Statement St;
-        ResultSet Rs;
         try {
             Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
             St = Con.createStatement();
@@ -288,25 +288,12 @@ public class Voting extends javax.swing.JFrame {
 
             }
         } catch (Exception e) {
-
         }
+
     }
 
-    private void CandidatesTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_CandidatesTableMouseClicked
-        DefaultTableModel model = (DefaultTableModel) CandidatesTable.getModel();
-        int MyIndex = CandidatesTable.getSelectedRow();
-
-        Key = Integer.valueOf(model.getValueAt(MyIndex, 0).toString());
-        String societyName = model.getValueAt(MyIndex, 3).toString();
-        String electionName = model.getValueAt(MyIndex, 4).toString();
-
-        SocId = logic.getSocietyIdByName(societyName);
-        ElecId = logic.getElectionIdByName(electionName);
-        CandidatePictureLb.setIcon(logic.fetchPhoto(Key, CandidatePictureLb));
-    }//GEN-LAST:event_CandidatesTableMouseClicked
-
     private int getSocietyIdByName(String name) {
-        int id = -1;
+
         try {
             Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
             pst = Con.prepareStatement("SELECT society_id FROM society_tbl WHERE society_name = ?");
@@ -320,11 +307,13 @@ public class Voting extends javax.swing.JFrame {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        
         return id;
+
     }
 
     private int getElectionIdByName(String name) {
-        int id = -1;
+
         try {
             Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
 
@@ -339,21 +328,41 @@ public class Voting extends javax.swing.JFrame {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        
         return id;
+
     }
 
     private void VCount() {
+
         try {
             St1 = Con.createStatement();
             Rs1 = St1.executeQuery("select MAx(vote_id) from vote_tbl");
             Rs1.next();
             VId = Rs1.getInt(1) + 1;
         } catch (Exception Ex) {
-
         }
+
     }
 
+
+    private void CandidatesTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_CandidatesTableMouseClicked
+
+        DefaultTableModel model = (DefaultTableModel) CandidatesTable.getModel();
+        int MyIndex = CandidatesTable.getSelectedRow();
+
+        Key = Integer.valueOf(model.getValueAt(MyIndex, 0).toString());
+        String societyName = model.getValueAt(MyIndex, 3).toString();
+        String electionName = model.getValueAt(MyIndex, 4).toString();
+
+        SocId = logic.getSocietyIdByName(societyName);
+        ElecId = logic.getElectionIdByName(electionName);
+        CandidatePictureLb.setIcon(logic.fetchPhoto(Key, CandidatePictureLb));
+
+    }//GEN-LAST:event_CandidatesTableMouseClicked
+
     private void VoteBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_VoteBtnMouseClicked
+        
         if (Key == -1) {
             JOptionPane.showMessageDialog(this, "Select your Candidate!");
         } else if (logic.hasAlreadyVoted(VotingId, ElecId)) {
@@ -369,6 +378,7 @@ public class Voting extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(this, "Voting failed!");
             }
         }
+        
     }//GEN-LAST:event_VoteBtnMouseClicked
 
     private void BackBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BackBtnMouseClicked

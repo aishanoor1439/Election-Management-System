@@ -1,7 +1,6 @@
 package com.mycompany.mavenproject26;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -9,6 +8,11 @@ import javax.swing.JOptionPane;
 
 public class Login extends javax.swing.JFrame {
 
+    Connection Con = null;
+    PreparedStatement pst = null;
+    ResultSet Ru, Rs = null;
+    Statement St = null;
+    
     LoginClass loginHelper = new LoginClass();
 
     public Login() {
@@ -143,11 +147,7 @@ public class Login extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    Connection Con = null;
-    PreparedStatement pst = null;
-    ResultSet Ru = null;
-    Statement St = null;
-    ResultSet Rs = null;
+    
 
     private void ComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ComboBoxActionPerformed
         // TODO add your handling code here:

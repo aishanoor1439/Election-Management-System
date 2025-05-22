@@ -21,4 +21,5 @@ public class MenuClass {
         new Dashboard().setVisible(true);
         menu.dispose();
     }
+    
 }

@@ -5,15 +5,11 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import net.proteanit.sql.DbUtils;
 import java.awt.Image;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
@@ -23,15 +19,14 @@ import javax.swing.table.DefaultTableModel;
 public class Candidates extends javax.swing.JFrame {
 
     private CandidateLogic logic;
+
     Connection Con = null;
     PreparedStatement pst = null;
-    ResultSet Ru = null;
-    Statement St = null;
-    Statement St1 = null;
-    ResultSet Rs1 = null;
-    int CId = 0;
+    ResultSet Ru, Rs, Rs1 = null;
+    Statement St, St1 = null;
     private int selectedCandidateId = -1;
     private String imgpath = null;
+    Object imgPath = null;
     int Key = -1;
 
     public Candidates() {
@@ -42,6 +37,7 @@ public class Candidates extends javax.swing.JFrame {
     }
 
     private void displayCandidates() {
+
         try {
             ResultSet rs = logic.getCandidates();
             DefaultTableModel model = (DefaultTableModel) CandidateTable.getModel();
@@ -58,11 +54,13 @@ public class Candidates extends javax.swing.JFrame {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error fetching candidates.");
         }
+
     }
 
     @SuppressWarnings("unchecked")
 
     private void GetSocietiesAndElections() {
+
         try {
             Connection Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
             Statement St = Con.createStatement();
@@ -85,23 +83,25 @@ public class Candidates extends javax.swing.JFrame {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
     }
 
     private void CandCount() {
+
         try {
             St1 = Con.createStatement();
             Rs1 = St1.executeQuery("select MAx(c_id) from candidate_tbl");
             Rs1.next();
-            CId = Rs1.getInt(1) + 1;
+            int CId = Rs1.getInt(1) + 1;
         } catch (Exception Ex) {
 
         }
+
     }
 
     private void FetchPhoto() {
+
         String Query = "Select c_photo from candidate_tbl where c_id = " + Key;
-        Statement St;
-        ResultSet Rs;
         try {
             Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
             St = Con.createStatement();
@@ -113,6 +113,7 @@ public class Candidates extends javax.swing.JFrame {
         } catch (Exception e) {
 
         }
+
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -460,6 +461,7 @@ public class Candidates extends javax.swing.JFrame {
     }//GEN-LAST:event_BrowseBtnActionPerformed
 
     public ImageIcon ResizePhoto(String ImgPath, byte[] pic, javax.swing.JLabel label) {
+
         ImageIcon MyImage = null;
         if (ImgPath != null) {
             MyImage = new ImageIcon(ImgPath);
@@ -469,9 +471,11 @@ public class Candidates extends javax.swing.JFrame {
         Image img = MyImage.getImage();
         Image newImg = img.getScaledInstance(label.getWidth(), label.getHeight(), Image.SCALE_SMOOTH);
         return new ImageIcon(newImg);
+
     }
 
     private void BrowseBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BrowseBtnMouseClicked
+
         JFileChooser chooser = new JFileChooser();
         chooser.setCurrentDirectory(new File(System.getProperty("user.home")));
         FileNameExtensionFilter filter = new FileNameExtensionFilter("*.images", "jpg", "gif", "png");
@@ -482,9 +486,11 @@ public class Candidates extends javax.swing.JFrame {
             imgpath = selectedFile.getAbsolutePath();
             CandPictureLb.setIcon(new ImageIcon(new ImageIcon(imgpath).getImage().getScaledInstance(CandPictureLb.getWidth(), CandPictureLb.getHeight(), Image.SCALE_SMOOTH)));
         }
+
     }//GEN-LAST:event_BrowseBtnMouseClicked
 
     private void AddBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_AddBtnMouseClicked
+
         if (CandNameTb.getText().isEmpty() || CandGenderCb.getSelectedIndex() == -1 || CandSocietyCb.getSelectedIndex() == -1 || CandElectionCb.getSelectedIndex() == -1) {
             JOptionPane.showMessageDialog(this, "Missing Information!");
         } else if (imgpath != null) {
@@ -508,9 +514,11 @@ public class Candidates extends javax.swing.JFrame {
         } else {
             JOptionPane.showMessageDialog(this, "Please select a photo!");
         }
+
     }//GEN-LAST:event_AddBtnMouseClicked
 
     private void CandidateTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_CandidateTableMouseClicked
+
         int rowIndex = CandidateTable.getSelectedRow();
         DefaultTableModel model = (DefaultTableModel) CandidateTable.getModel();
         selectedCandidateId = Integer.parseInt(model.getValueAt(rowIndex, 0).toString());
@@ -522,9 +530,11 @@ public class Candidates extends javax.swing.JFrame {
         if (photo != null) {
             CandPictureLb.setIcon(new ImageIcon(new ImageIcon(photo).getImage().getScaledInstance(CandPictureLb.getWidth(), CandPictureLb.getHeight(), Image.SCALE_SMOOTH)));
         }
+
     }//GEN-LAST:event_CandidateTableMouseClicked
 
     private void DeleteBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_DeleteBtnMouseClicked
+
         if (selectedCandidateId != -1) {
             int response = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this candidate?", "Confirm Deletion", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
             if (response != JOptionPane.YES_OPTION) {
@@ -540,26 +550,39 @@ public class Candidates extends javax.swing.JFrame {
         } else {
             JOptionPane.showMessageDialog(this, "Select a candidate to delete!");
         }
+
     }//GEN-LAST:event_DeleteBtnMouseClicked
 
     private void EditBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_EditBtnMouseClicked
-        Object imgPath = null;
+
     if (selectedCandidateId == -1) {
         JOptionPane.showMessageDialog(this, "Missing Information: Candidate ID not selected!");
         return;
     }
+
+    int confirm = JOptionPane.showConfirmDialog(
+            this,
+            "Are you sure you want to edit this candidate's information?",
+            "Confirm Edit",
+            JOptionPane.YES_NO_OPTION
+    );
+
+    if (confirm != JOptionPane.YES_OPTION) {
+        return;
+    }
+
     JFileChooser fileChooser = new JFileChooser();
     int returnVal = fileChooser.showOpenDialog(this);
     if (returnVal == JFileChooser.APPROVE_OPTION) {
         File selectedFile = fileChooser.getSelectedFile();
         imgPath = selectedFile.getAbsolutePath();
         boolean success = logic.updateCandidate(
-            selectedCandidateId,
-            CandNameTb.getText(),
-            CandGenderCb.getSelectedItem().toString(),
-            CandSocietyCb.getSelectedItem().toString(),
-            CandElectionCb.getSelectedItem().toString(),
-            imgPath
+                selectedCandidateId,
+                CandNameTb.getText(),
+                CandGenderCb.getSelectedItem().toString(),
+                CandSocietyCb.getSelectedItem().toString(),
+                CandElectionCb.getSelectedItem().toString(),
+                imgPath
         );
         if (success) {
             displayCandidates();
@@ -570,6 +593,7 @@ public class Candidates extends javax.swing.JFrame {
     } else {
         JOptionPane.showMessageDialog(this, "No photo selected. Please choose an image.");
     }
+        
     }//GEN-LAST:event_EditBtnMouseClicked
 
     private void BackBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BackBtnMouseClicked

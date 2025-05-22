@@ -14,25 +14,27 @@ import net.proteanit.sql.DbUtils;
 
 public class Dashboard extends javax.swing.JFrame {
 
-    public Dashboard() {
-        initComponents();
-        DisplayELections();
-    }
-
     Connection Con = null;
     PreparedStatement pst = null;
     ResultSet Ru = null;
     Statement St = null;
     ResultSet Rs = null;
+    private DashboardLogic logic;
+    private int selectedElectionId = -1;
+    int WinnerID, Votes, TotalVotes;
+    double WinPercentage;
+    int Key = -1;
 
-    private void DisplayELections() {
-        try {
-            Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
-            St = Con.createStatement();
-            Ru = St.executeQuery("Select * from election_tbl");
-            ElectionsTable.setModel(DbUtils.resultSetToTableModel(Ru));
-        } catch (SQLException Ex) {
+    public Dashboard() {
+        initComponents();
+        logic = new DashboardLogic();
+        displayElections();
+    }
 
+    private void displayElections() {
+        ResultSet rs = logic.getAllElections();
+        if (rs != null) {
+            ElectionsTable.setModel(DbUtils.resultSetToTableModel(rs));
         }
     }
 
@@ -236,9 +238,8 @@ public class Dashboard extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_BackBtnActionPerformed
 
-    int WinnerID, Votes, Percentage;
-
     private void GetWinner() {
+        
         try {
             Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
             St = Con.createStatement();
@@ -252,9 +253,11 @@ public class Dashboard extends javax.swing.JFrame {
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "GetWinner error: " + e.getMessage());
         }
+        
     }
 
     public ImageIcon ResizePhoto(String ImgPath, byte[] pic, javax.swing.JLabel label) {
+        
         ImageIcon MyImage = null;
 
         if (ImgPath != null) {
@@ -266,15 +269,18 @@ public class Dashboard extends javax.swing.JFrame {
         Image img = MyImage.getImage();
         Image newImg = img.getScaledInstance(label.getWidth(), label.getHeight(), Image.SCALE_SMOOTH);
         return new ImageIcon(newImg);
+        
     }
 
     private void GetWinnerData() {
+        
         if (WinnerID == -1) {
             JOptionPane.showMessageDialog(this, "Winner not determined yet.");
             return;
         }
 
         String Query = "SELECT c_name, c_photo FROM candidate_tbl WHERE c_id = " + WinnerID;
+        
         try {
             Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
             Statement St = Con.createStatement();
@@ -288,9 +294,11 @@ public class Dashboard extends javax.swing.JFrame {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "GetWinnerData error: " + e.getMessage());
         }
+        
     }
 
     private void GetVotes() {
+        
         try {
             Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
             St = Con.createStatement();
@@ -304,12 +312,11 @@ public class Dashboard extends javax.swing.JFrame {
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "GetWinner error: " + e.getMessage());
         }
+        
     }
 
-    int TotalVotes;
-    double WinPercentage;
-
     private void GetPercentage() {
+        
         try {
             Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
             St = Con.createStatement();
@@ -317,26 +324,44 @@ public class Dashboard extends javax.swing.JFrame {
             Rs = St.executeQuery(Query);
             while (Rs.next()) {
                 TotalVotes = Rs.getInt(1);
-                JOptionPane.showMessageDialog(this, ""+TotalVotes);
-                WinPercentage = (Votes/TotalVotes)*100;
-                PercentageLb.setText(WinPercentage+"%");
-                
+                JOptionPane.showMessageDialog(this, "" + TotalVotes);
+                WinPercentage = (Votes / TotalVotes) * 100;
+                PercentageLb.setText(WinPercentage + "%");
+
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "GetWinner error: " + e.getMessage());
         }
+        
     }
 
-    int Key = -1;
-    
     private void ElectionsTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ElectionsTableMouseClicked
+        
         DefaultTableModel model = (DefaultTableModel) ElectionsTable.getModel();
-        int MyIndex = ElectionsTable.getSelectedRow();
-        Key = Integer.valueOf(model.getValueAt(MyIndex, 0).toString());
-        GetWinner();
-        GetWinnerData();
-        GetVotes();
-        GetPercentage();
+        int selectedRow = ElectionsTable.getSelectedRow();
+        selectedElectionId = Integer.parseInt(model.getValueAt(selectedRow, 0).toString());
+
+        int winnerId = logic.getWinnerCandidateId(selectedElectionId);
+        if (winnerId == -1) {
+            JOptionPane.showMessageDialog(this, "No winner found for this election.");
+            return;
+        }
+
+        // Winner Data
+        DashboardLogic.WinnerData winner = logic.getWinnerData(winnerId);
+        if (winner != null) {
+            CandidateNameLb.setText(winner.name);
+            CandidatePictureLb.setIcon(logic.resizePhoto(winner.photoBytes, CandidatePictureLb));
+        }
+
+        // Votes
+        int candidateVotes = logic.getCandidateVotes(winnerId);
+        int totalVotes = logic.getTotalVotesInElection(selectedElectionId);
+        double percentage = totalVotes > 0 ? ((double) candidateVotes / totalVotes) * 100 : 0;
+
+        VotesLb.setText(candidateVotes + " Votes");
+        PercentageLb.setText(String.format("%.2f", percentage) + " %");
+        
     }//GEN-LAST:event_ElectionsTableMouseClicked
 
     public static void main(String args[]) {

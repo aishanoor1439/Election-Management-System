@@ -15,13 +15,11 @@ import net.proteanit.sql.DbUtils;
 public class Voters extends javax.swing.JFrame {
 
     private VoterLogic logic;
+
     Connection Con = null;
     PreparedStatement pst = null;
-    ResultSet Ru = null;
-    Statement St = null;
-    Statement St1 = null;
-    ResultSet Rs1 = null;
-    int VId = 0;
+    ResultSet Ru, Rs1, rsElections, rsSocieties = null;
+    Statement St, St1 = null;
     private int selectedVoterId = -1;
 
     public Voters() {
@@ -359,6 +357,7 @@ public class Voters extends javax.swing.JFrame {
     }//GEN-LAST:event_VElectionCbActionPerformed
 
     private void displayVoters() {
+
         try {
             ResultSet rs = logic.getVoters();
             DefaultTableModel model = (DefaultTableModel) VotersTable.getModel();
@@ -376,21 +375,23 @@ public class Voters extends javax.swing.JFrame {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error fetching voters.");
         }
+
     }
 
     private void GetElectionsAndSocieties() {
+
         try {
-            Connection Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
-            Statement St = Con.createStatement();
+            Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
+            St = Con.createStatement();
 
             // Load elections
-            ResultSet rsElections = St.executeQuery("SELECT e_name FROM election_tbl");
+            rsElections = St.executeQuery("SELECT e_name FROM election_tbl");
             while (rsElections.next()) {
                 VElectionCb.addItem(rsElections.getString("e_name"));
             }
 
             // Load societies
-            ResultSet rsSocieties = St.executeQuery("SELECT society_name FROM society_tbl");
+            rsSocieties = St.executeQuery("SELECT society_name FROM society_tbl");
             while (rsSocieties.next()) {
                 VSocietyCb.addItem(rsSocieties.getString("society_name"));
             }
@@ -402,9 +403,11 @@ public class Voters extends javax.swing.JFrame {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
     }
 
     private void DisplayVoters() {
+
         try {
             Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/society_polls", "root", "");
             St = Con.createStatement();
@@ -413,20 +416,24 @@ public class Voters extends javax.swing.JFrame {
         } catch (SQLException Ex) {
 
         }
+
     }
 
     private void VCount() {
+
         try {
             St1 = Con.createStatement();
             Rs1 = St1.executeQuery("select MAx(v_id) from voter_tbl");
             Rs1.next();
-            VId = Rs1.getInt(1) + 1;
+            int VId = Rs1.getInt(1) + 1;
         } catch (Exception Ex) {
 
         }
+
     }
 
     private void AddBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_AddBtnMouseClicked
+
         if (VNameTb.getText().isEmpty() || VPasswordTb.getText().isEmpty() || VGenderCb.getSelectedIndex() == -1 || VElectionCb.getSelectedIndex() == -1 || VSocietyCb.getSelectedIndex() == -1) {
             JOptionPane.showMessageDialog(this, "Missing Information!");
         } else {
@@ -440,23 +447,40 @@ public class Voters extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(this, "Error Registering Voter!");
             }
         }
+
     }//GEN-LAST:event_AddBtnMouseClicked
 
     private void DeleteBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_DeleteBtnMouseClicked
+
         if (selectedVoterId == -1) {
             JOptionPane.showMessageDialog(this, "Please select a voter to delete.");
-        } else {
-            boolean success = logic.deleteVoter(selectedVoterId);
-            if (success) {
-                JOptionPane.showMessageDialog(this, "Voter Deleted Successfully!");
-                displayVoters();
-            } else {
-                JOptionPane.showMessageDialog(this, "Error Deleting Voter!");
-            }
+            return;
         }
+
+        int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "Are you sure you want to delete this voter?",
+                "Confirm Deletion",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE
+        );
+
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        boolean success = logic.deleteVoter(selectedVoterId);
+        if (success) {
+            JOptionPane.showMessageDialog(this, "Voter Deleted Successfully!");
+            displayVoters();
+        } else {
+            JOptionPane.showMessageDialog(this, "Error Deleting Voter!");
+        }
+        
     }//GEN-LAST:event_DeleteBtnMouseClicked
 
     private void VotersTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_VotersTableMouseClicked
+        
         DefaultTableModel model = (DefaultTableModel) VotersTable.getModel();
         int row = VotersTable.getSelectedRow();
         selectedVoterId = Integer.parseInt(model.getValueAt(row, 0).toString());
@@ -465,22 +489,49 @@ public class Voters extends javax.swing.JFrame {
         VSocietyCb.setSelectedItem(model.getValueAt(row, 3).toString());
         VElectionCb.setSelectedItem(model.getValueAt(row, 4).toString());
         VPasswordTb.setText(model.getValueAt(row, 5).toString());
+        
     }//GEN-LAST:event_VotersTableMouseClicked
 
     private void EditBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_EditBtnMouseClicked
-        if (selectedVoterId == -1 || VNameTb.getText().isEmpty() || VGenderCb.getSelectedIndex() == -1 || VSocietyCb.getSelectedIndex() == -1 || VElectionCb.getSelectedIndex() == -1 || VPasswordTb.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Missing Information!");
-        } else {
-            boolean success = logic.updateVoter(selectedVoterId, VNameTb.getText(), VGenderCb.getSelectedItem().toString(),
-                    VSocietyCb.getSelectedItem().toString(), VElectionCb.getSelectedItem().toString(), VPasswordTb.getText());
+        
+        if (selectedVoterId == -1 ||
+        VNameTb.getText().isEmpty() ||
+        VGenderCb.getSelectedIndex() == -1 ||
+        VSocietyCb.getSelectedIndex() == -1 ||
+        VElectionCb.getSelectedIndex() == -1 ||
+        VPasswordTb.getText().isEmpty()) {
+        
+        JOptionPane.showMessageDialog(this, "Missing Information!");
+        return;
+    }
 
-            if (success) {
-                JOptionPane.showMessageDialog(this, "Voter Updated Successfully!");
-                displayVoters();
-            } else {
-                JOptionPane.showMessageDialog(this, "Error Updating Voter!");
-            }
-        }
+    int confirm = JOptionPane.showConfirmDialog(
+            this,
+            "Are you sure you want to update this voter's information?",
+            "Confirm Edit",
+            JOptionPane.YES_NO_OPTION
+    );
+
+    if (confirm != JOptionPane.YES_OPTION) {
+        return;
+    }
+
+    boolean success = logic.updateVoter(
+            selectedVoterId,
+            VNameTb.getText(),
+            VGenderCb.getSelectedItem().toString(),
+            VSocietyCb.getSelectedItem().toString(),
+            VElectionCb.getSelectedItem().toString(),
+            VPasswordTb.getText()
+    );
+
+    if (success) {
+        JOptionPane.showMessageDialog(this, "Voter Updated Successfully!");
+        displayVoters();
+    } else {
+        JOptionPane.showMessageDialog(this, "Error Updating Voter!");
+    }
+    
     }//GEN-LAST:event_EditBtnMouseClicked
 
     private void BackBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BackBtnMouseClicked
