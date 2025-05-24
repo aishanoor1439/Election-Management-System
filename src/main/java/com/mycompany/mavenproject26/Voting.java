@@ -91,6 +91,7 @@ public class Voting extends javax.swing.JFrame {
         jLabel11 = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
         jLabel12 = new javax.swing.JLabel();
+        DashboardBtn = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -189,6 +190,21 @@ public class Voting extends javax.swing.JFrame {
                 .addContainerGap(16, Short.MAX_VALUE))
         );
 
+        DashboardBtn.setBackground(new java.awt.Color(42, 31, 91));
+        DashboardBtn.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        DashboardBtn.setForeground(new java.awt.Color(199, 226, 245));
+        DashboardBtn.setText("Results");
+        DashboardBtn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                DashboardBtnMouseClicked(evt);
+            }
+        });
+        DashboardBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                DashboardBtnActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -217,16 +233,18 @@ public class Voting extends javax.swing.JFrame {
                                 .addComponent(CandidateNameLb)))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
+            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(407, 407, 407)
-                        .addComponent(BackBtn))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(413, 413, 413)
-                        .addComponent(VoteBtn)))
+                        .addComponent(VoteBtn))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(363, 363, 363)
+                        .addComponent(BackBtn)
+                        .addGap(18, 18, 18)
+                        .addComponent(DashboardBtn)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -247,9 +265,13 @@ public class Voting extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(BackBtn)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(BackBtn)
+                    .addComponent(DashboardBtn))
                 .addContainerGap(57, Short.MAX_VALUE))
         );
+
+        DashboardBtn.getAccessibleContext().setAccessibleName("Back");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -420,6 +442,15 @@ public class Voting extends javax.swing.JFrame {
         this.dispose();
     }//GEN-LAST:event_BackBtnMouseClicked
 
+    private void DashboardBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_DashboardBtnMouseClicked
+        new Dashboard().setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_DashboardBtnMouseClicked
+
+    private void DashboardBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DashboardBtnActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_DashboardBtnActionPerformed
+
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -433,6 +464,7 @@ public class Voting extends javax.swing.JFrame {
     private javax.swing.JLabel CandidateNameLb;
     private javax.swing.JLabel CandidatePictureLb;
     private javax.swing.JTable CandidatesTable;
+    private javax.swing.JButton DashboardBtn;
     private javax.swing.JButton VoteBtn;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
