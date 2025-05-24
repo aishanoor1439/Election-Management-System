@@ -50,8 +50,12 @@ public class VotingLogic extends AbstractBUSPs {
         try {
             Statement st = Con.createStatement();
             ResultSet rs = st.executeQuery("SELECT c_photo FROM candidate_tbl WHERE c_id = " + candidateId);
+          
+
             if (rs.next()) {
+//                  CandidateNameLb.setText(rs.getString("c_name")); // ✅ Ye line add ki gayi hai,JLabel CandidateNameLb
                 return resizePhoto(null, rs.getBytes("c_photo"), label);
+                 
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -60,6 +64,20 @@ public class VotingLogic extends AbstractBUSPs {
         return null;
 
     }
+      public String fetchname(int candidateId) {
+    String name = null;
+    try {
+        Statement st = Con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT c_name FROM candidate_tbl WHERE c_id = " + candidateId);
+
+        if (rs.next()) {
+            name = rs.getString("c_name");
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return name;
+}
 
     public int getSocietyIdByName(String name) {
 

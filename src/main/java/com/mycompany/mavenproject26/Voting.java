@@ -296,12 +296,29 @@ public class Voting extends javax.swing.JFrame {
             Rs = St.executeQuery(Query);
             if (Rs.next()) {
                 CandidatePictureLb.setIcon(ResizePhoto(null, Rs.getBytes("c_photo"), CandidatePictureLb));
+               
 
             }
         } catch (Exception e) {
         }
 
     }
+    public String fetchname(int candidateId) {
+    String name = null;
+    try {
+        Statement st = Con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT c_name FROM candidate_tbl WHERE c_id = " + candidateId);
+
+        if (rs.next()) {
+            name = rs.getString("c_name");
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return name;
+}
+
+
 
     private int getSocietyIdByName(String name) {
 
@@ -358,18 +375,24 @@ public class Voting extends javax.swing.JFrame {
 
 
     private void CandidatesTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_CandidatesTableMouseClicked
+ 
+    DefaultTableModel model = (DefaultTableModel) CandidatesTable.getModel();
+    int MyIndex = CandidatesTable.getSelectedRow();
 
-        DefaultTableModel model = (DefaultTableModel) CandidatesTable.getModel();
-        int MyIndex = CandidatesTable.getSelectedRow();
+    Key = Integer.valueOf(model.getValueAt(MyIndex, 0).toString());
+    String societyName = model.getValueAt(MyIndex, 3).toString();
+    String electionName = model.getValueAt(MyIndex, 4).toString();
 
-        Key = Integer.valueOf(model.getValueAt(MyIndex, 0).toString());
-        String societyName = model.getValueAt(MyIndex, 3).toString();
-        String electionName = model.getValueAt(MyIndex, 4).toString();
+    SocId = logic.getSocietyIdByName(societyName);
+    ElecId = logic.getElectionIdByName(electionName);
 
-        SocId = logic.getSocietyIdByName(societyName);
-        ElecId = logic.getElectionIdByName(electionName);
-        CandidatePictureLb.setIcon(logic.fetchPhoto(Key, CandidatePictureLb));
+    CandidatePictureLb.setIcon(logic.fetchPhoto(Key, CandidatePictureLb));
 
+    String candidateName = logic.fetchname(Key); // fetchname now returns String
+    CandidateNameLb.setText(candidateName);
+
+
+// Addition of candidate name,CandidateNameLb
     }//GEN-LAST:event_CandidatesTableMouseClicked
 
     private void VoteBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_VoteBtnMouseClicked
