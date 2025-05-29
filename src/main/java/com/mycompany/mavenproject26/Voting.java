@@ -91,7 +91,7 @@ public class Voting extends javax.swing.JFrame {
         jLabel11 = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
         jLabel12 = new javax.swing.JLabel();
-        DashboardBtn = new javax.swing.JButton();
+        ResultBtn = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -190,18 +190,18 @@ public class Voting extends javax.swing.JFrame {
                 .addContainerGap(16, Short.MAX_VALUE))
         );
 
-        DashboardBtn.setBackground(new java.awt.Color(42, 31, 91));
-        DashboardBtn.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        DashboardBtn.setForeground(new java.awt.Color(199, 226, 245));
-        DashboardBtn.setText("Results");
-        DashboardBtn.addMouseListener(new java.awt.event.MouseAdapter() {
+        ResultBtn.setBackground(new java.awt.Color(42, 31, 91));
+        ResultBtn.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        ResultBtn.setForeground(new java.awt.Color(199, 226, 245));
+        ResultBtn.setText("Results");
+        ResultBtn.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                DashboardBtnMouseClicked(evt);
+                ResultBtnMouseClicked(evt);
             }
         });
-        DashboardBtn.addActionListener(new java.awt.event.ActionListener() {
+        ResultBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                DashboardBtnActionPerformed(evt);
+                ResultBtnActionPerformed(evt);
             }
         });
 
@@ -243,7 +243,7 @@ public class Voting extends javax.swing.JFrame {
                         .addGap(363, 363, 363)
                         .addComponent(BackBtn)
                         .addGap(18, 18, 18)
-                        .addComponent(DashboardBtn)))
+                        .addComponent(ResultBtn)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -267,11 +267,11 @@ public class Voting extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(BackBtn)
-                    .addComponent(DashboardBtn))
+                    .addComponent(ResultBtn))
                 .addContainerGap(57, Short.MAX_VALUE))
         );
 
-        DashboardBtn.getAccessibleContext().setAccessibleName("Back");
+        ResultBtn.getAccessibleContext().setAccessibleName("Back");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -442,14 +442,14 @@ public class Voting extends javax.swing.JFrame {
         this.dispose();
     }//GEN-LAST:event_BackBtnMouseClicked
 
-    private void DashboardBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_DashboardBtnMouseClicked
-        new Dashboard().setVisible(true);
+    private void ResultBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ResultBtnMouseClicked
+        new Dashboard(true).setVisible(true);
         this.dispose();
-    }//GEN-LAST:event_DashboardBtnMouseClicked
+    }//GEN-LAST:event_ResultBtnMouseClicked
 
-    private void DashboardBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DashboardBtnActionPerformed
+    private void ResultBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ResultBtnActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_DashboardBtnActionPerformed
+    }//GEN-LAST:event_ResultBtnActionPerformed
 
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -464,7 +464,7 @@ public class Voting extends javax.swing.JFrame {
     private javax.swing.JLabel CandidateNameLb;
     private javax.swing.JLabel CandidatePictureLb;
     private javax.swing.JTable CandidatesTable;
-    private javax.swing.JButton DashboardBtn;
+    private javax.swing.JButton ResultBtn;
     private javax.swing.JButton VoteBtn;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;

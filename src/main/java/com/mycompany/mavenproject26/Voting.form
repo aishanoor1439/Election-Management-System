@@ -83,7 +83,7 @@
                           <EmptySpace min="-2" pref="363" max="-2" attributes="0"/>
                           <Component id="BackBtn" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
-                          <Component id="DashboardBtn" min="-2" max="-2" attributes="0"/>
+                          <Component id="ResultBtn" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                   <EmptySpace max="32767" attributes="0"/>
@@ -111,7 +111,7 @@
                   <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="BackBtn" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="DashboardBtn" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="ResultBtn" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace pref="57" max="32767" attributes="0"/>
               </Group>
@@ -326,7 +326,7 @@
             </Component>
           </SubComponents>
         </Container>
-        <Component class="javax.swing.JButton" name="DashboardBtn">
+        <Component class="javax.swing.JButton" name="ResultBtn">
           <Properties>
             <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
               <Color blue="5b" green="1f" red="2a" type="rgb"/>
@@ -343,8 +343,8 @@
             <Property name="AccessibleContext.accessibleName" type="java.lang.String" value="Back"/>
           </AccessibilityProperties>
           <Events>
-            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="DashboardBtnMouseClicked"/>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="DashboardBtnActionPerformed"/>
+            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="ResultBtnMouseClicked"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="ResultBtnActionPerformed"/>
           </Events>
         </Component>
       </SubComponents>

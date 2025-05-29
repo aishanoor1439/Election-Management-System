@@ -30,6 +30,15 @@ public class Dashboard extends javax.swing.JFrame {
         logic = new DashboardLogic();
         displayElections();
     }
+    public Dashboard(boolean hideBackButton) {
+    initComponents();
+    logic = new DashboardLogic();
+    displayElections();
+
+    if (hideBackButton) {
+        BackBtn.setVisible(false);  // Back button hide kar do
+    }
+}
 
     private void displayElections() {
         ResultSet rs = logic.getAllElections();
